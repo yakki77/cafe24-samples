@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>구글 채널 Setup & Reporting</title>
+    <!-- React and Babel -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Inter', 'Noto Sans KR', sans-serif; background-color: #f8f9fa; margin: 0; color: #374151; }
+        .sidebar-gradient {
+            background: linear-gradient(to right, #ea4335 25%, #fbbc05 25% 50%, #34a853 50% 75%, #4285f4 75%);
+            height: 120px;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #aaa; }
+        
+        .status-dropdown-enter { animation: slideDown 0.2s ease-out; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hot-badge {
+            background-color: #ff4d4f;
+            color: white;
+            font-size: 9px;
+            font-weight: 900;
+            padding: 1px 5px;
+            border-radius: 4px;
+            margin-left: 6px;
+            animation: pulse-hot 2s infinite;
+        }
+        @keyframes pulse-hot {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+    <div id="root" class="flex w-full"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        
+        const LucideIcon = ({ name, size = 18, className = "" }) => {
+            const iconRef = useRef(null);
+            useEffect(() => { if (window.lucide) window.lucide.createIcons(); }, [name]);
+            const kebabName = name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+            return <i data-lucide={kebabName} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        const GoogleIcons = {
+            G_Colorful: () => (
+                <svg viewBox="0 0 24 24" style={{width: '16px', height: '16px'}}>
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
+            ),
+            YouTube: () => (
+                <svg viewBox="0 0 24 24" style={{width: '18px', height: '18px'}}>
+                    <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" fill="#FF0000"/>
+                </svg>
+            ),
+            Gmail: () => (
+                <svg viewBox="0 0 24 24" style={{width: '18px', height: '18px'}}>
+                    <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#EA4335"/>
+                </svg>
+            ),
+            Maps: () => (
+                <svg viewBox="0 0 24 24" style={{width: '18px', height: '18px'}}>
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#34A853"/>
+                </svg>
+            ),
+            Sparkle: () => (
+                <svg viewBox="0 0 24 24" style={{width: '18px', height: '18px'}}>
+                    <path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2z" fill="#4285F4"/>
+                </svg>
+            )
+        };
+
+        const App = () => {
+            const [view, setView] = useState('reporting'); 
+            const [pmaxName, setPmaxName] = useState('PMAX 1');
+            const [pmaxBudget, setPmaxBudget] = useState(70000);
+            const [dgName, setDgName] = useState('Demand Gen 1');
+            const [dgBudget, setDgBudget] = useState(70000);
+            const [pmaxActive, setPmaxActive] = useState(false);
+            const [dgActive, setDgActive] = useState(false);
+            const [headlines, setHeadlines] = useState(['']);
+            const [longHeadlines, setLongHeadlines] = useState(['']);
+            const [descriptions, setDescriptions] = useState(['']);
+            const [selectedVideos, setSelectedVideos] = useState([]);
+            const [images, setImages] = useState([
+                { id: 1, url: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400', selected: true },
+                { id: 2, url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', selected: true },
+                { id: 3, url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400', selected: false },
+            ]);
+
+            const navigateToCreation = (type = 'new', campaignName = '') => {
+                if (type === 'edit') {
+                    if (campaignName.includes('Demand Gen')) setDgName(campaignName);
+                    else setPmaxName(campaignName);
+                } else {
+                    setHeadlines(['']); setLongHeadlines(['']); setDescriptions(['']); setSelectedVideos([]);
+                }
+                setView('creation');
+            };
+
+            const handleEdit = (name) => navigateToCreation('edit', name);
+
+            return (
+                <div className="flex h-screen w-full overflow-hidden">
+                    {/* --- SIDEBAR --- */}
+                    <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 text-left">
+                        <div className="sidebar-gradient relative">
+                            <div className="absolute top-2 right-4 text-white text-[10px] font-bold bg-black bg-opacity-20 px-2 py-1 rounded tracking-tighter uppercase">
+                                powered by <span className="font-black text-blue-100">cafe24</span>
+                            </div>
+                            <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+                                <div className="w-16 h-16 bg-white rounded-full shadow-md flex items-center justify-center border p-1">
+                                    <GoogleIcons.G_Colorful />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-12 px-6 text-center">
+                            <h1 className="text-xl font-bold text-gray-900 font-sans">구글 채널 <span className="text-sm font-normal text-gray-500 block">(Google Channel)</span></h1>
+                            <p className="mt-4 text-[11px] text-gray-500 leading-relaxed">
+                                구글 서비스에 쇼핑몰을 홍보하여 전 세계<br/>
+                                (Promote your shopping mall on Google Services to reach a global audience.)
+                            </p>
+                            <p className="mt-2 text-[11px] text-gray-500 leading-relaxed font-medium">
+                                수십억 명의 온라인 사용자에게 도달하세요.<br/>(Reach billions of online users.)
+                            </p>
+                        </div>
+                        <nav className="mt-8 flex-1">
+                            <div className="px-6 py-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">구글 채널 (Google Channel)</div>
+                            <ul className="mt-1 space-y-0.5">
+                                <li><a href="#" className="flex items-center px-6 py-3 text-sm hover:bg-gray-50 transition">홈 (Home)</a></li>
+                                <li><a href="#" className="flex items-center px-6 py-3 text-sm hover:bg-gray-50 transition">채널 설정 (Settings)</a></li>
+                                <li><a href="#" className="flex items-center px-6 py-3 text-sm hover:bg-gray-50 transition">상품 피드 (Products)</a></li>
+                                <li className={`${view === 'reporting' || view === 'creation' ? 'bg-blue-50 border-l-4 border-blue-600' : ''}`}>
+                                    <a href="#" onClick={() => setView('reporting')} className={`flex items-center px-6 py-3 text-sm transition ${view === 'reporting' || view === 'creation' ? 'text-blue-600 font-bold' : 'hover:bg-gray-50'}`}>
+                                        쇼핑 캠페인 (Campaign) <span className="hot-badge">HOT</span>
+                                    </a>
+                                </li>
+                                <li><a href="#" className="flex items-center px-6 py-3 text-sm hover:bg-gray-50 transition">자주 묻는 질문 (FAQ)</a></li>
+                            </ul>
+                        </nav>
+                        <div className="p-4 border-t border-gray-50">
+                            <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm relative overflow-hidden group cursor-pointer hover:border-blue-300 transition-all">
+                                <div className="flex items-start gap-3 text-left">
+                                    <div className="bg-yellow-50 p-2 rounded-lg text-yellow-500 shadow-sm"><LucideIcon name="ShieldCheck" size={24} /></div>
+                                    <div>
+                                        <h4 className="text-xs font-bold text-gray-900 leading-tight">이벤트 모니터링 신청 <br/>(Event Monitoring Application)</h4>
+                                        <p className="mt-1 text-[10px] text-gray-500 leading-tight">To prevent shopping mall access issues, apply in advance.</p>
+                                    </div>
+                                </div>
+                                <div className="mt-2 text-right"><span className="text-gray-400 text-xs font-black tracking-widest">→</span></div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* --- MAIN CONTENT AREA --- */}
+                    <main className="flex-1 overflow-y-auto">
+                        {view === 'reporting' ? (
+                            <ReportingView onNew={() => navigateToCreation('new')} onEdit={handleEdit} />
+                        ) : (
+                            <CreationView 
+                                onExit={() => setView('reporting')}
+                                pmaxName={pmaxName} setPmaxName={setPmaxName}
+                                pmaxBudget={pmaxBudget} setPmaxBudget={setPmaxBudget}
+                                dgName={dgName} setDgName={setDgName}
+                                dgBudget={dgBudget} setDgBudget={setDgBudget}
+                                headlines={headlines} setHeadlines={setHeadlines}
+                                longHeadlines={longHeadlines} setLongHeadlines={setLongHeadlines}
+                                descriptions={descriptions} setDescriptions={setDescriptions}
+                                pmaxActive={pmaxActive} setPmaxActive={setPmaxActive}
+                                dgActive={dgActive} setDgActive={setDgActive}
+                                images={images} setImages={setImages}
+                                selectedVideos={selectedVideos} setSelectedVideos={setSelectedVideos}
+                            />
+                        )}
+                    </main>
+                </div>
+            );
+        };
+
+        // --- View: Reporting ---
+        const ReportingView = ({ onNew, onEdit }) => {
+            return (
+                <div className="p-8 flex flex-col h-full animate-in fade-in duration-300 text-left">
+                    <div className="flex justify-between items-start mb-6">
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">쇼핑 캠페인 <span className="text-sm font-normal text-gray-500 mt-1 tracking-tight">캠페인 성과 집계 기준 : 지난 30일</span></h2>
+                            <p className="text-sm text-gray-500">(Shopping Campaign Performance Calculation Basis: Last 30 days)</p>
+                        </div>
+                        <button onClick={onNew} className="bg-[#0050ff] hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-blue-100 transition flex items-center gap-2">
+                            <LucideIcon name="Plus" size={16} /> 새 캠페인 (New Campaign)
+                        </button>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col flex-1 overflow-hidden">
+                        <div className="p-4 border-b flex justify-between items-center bg-gray-50/50">
+                            <button className="bg-white border border-gray-100 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-bold cursor-not-allowed uppercase tracking-tighter">선택 삭제 (Delete Selection)</button>
+                            <div className="relative">
+                                <span className="absolute inset-y-0 left-3 flex items-center text-gray-400"><LucideIcon name="Search" size={14} /></span>
+                                <input type="text" placeholder="캠페인 이름으로 검색 (Search by Campaign Name)" className="pl-9 pr-4 py-1.5 border border-gray-200 rounded-lg text-sm w-96 outline-none focus:ring-1 focus:ring-blue-200 shadow-inner" />
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-left border-collapse min-w-[1450px]">
+                                <thead className="bg-gray-50 text-[11px] font-black text-gray-500 uppercase tracking-widest border-b">
+                                    <tr>
+                                        <th className="p-4 w-12 text-center"><input type="checkbox" className="rounded" /></th>
+                                        <th className="p-4 w-80 text-left">캠페인 이름 (Campaign Name)</th>
+                                        <th className="p-4 w-40 text-center">상태 (Status)</th>
+                                        <th className="p-4 text-right">비용 (Cost)</th>
+                                        <th className="p-4 text-right">노출수 (Imp)</th>
+                                        <th className="p-4 text-right">클릭수 (Clicks)</th>
+                                        <th className="p-4 text-right">CTR</th>
+                                        <th className="p-4 text-right">주문수 (Orders)</th>
+                                        <th className="p-4 text-right font-black">총 매출 (GMV)</th>
+                                        <th className="p-4 text-right font-black">ROAS</th>
+                                        <th className="p-4 w-32 text-center sticky right-0 bg-gray-50 border-l shadow-inner">작업 (Action)</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y text-sm font-medium">
+                                    <CampaignTableRow name="PMAX 1" cost="₩145,000" imp="24,512" clicks="1,102" ctr="4.5%" orders="56" gmv="₩3,420,000" roas="23.5" type="pmax" onEdit={() => onEdit("PMAX 1")} />
+                                    <CampaignTableRow name="Demand Gen 1" cost="₩89,200" imp="18,340" clicks="924" ctr="5.0%" orders="12" gmv="₩1,120,000" roas="12.5" type="dg" onEdit={() => onEdit("Demand Gen 1")} />
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 p-4 bg-blue-50/50 border border-blue-100 rounded-xl flex items-start gap-3 text-left">
+                        <LucideIcon name="Info" className="text-blue-400 mt-1" />
+                        <div className="text-xs text-gray-600 leading-relaxed font-medium">
+                            <p className="font-bold mb-1 underline">구글 채널에서 생성한 캠페인 리스트입니다. (List of campaigns created on the Google channel.)</p>
+                            <p>구글 채널 외부에서 생성한 캠페인 리스트 전체는 Google Ads 에서 확인하실 수 있습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CampaignTableRow = ({ name, cost, imp, clicks, ctr, orders, gmv, roas, type, onEdit }) => {
+            const [status, setStatus] = useState('Enabled');
+            const [isOpen, setIsOpen] = useState(false);
+            const dropRef = useRef(null);
+            
+            useEffect(() => {
+                const close = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setIsOpen(false); };
+                document.addEventListener('mousedown', close);
+                return () => document.removeEventListener('mousedown', close);
+            }, []);
+
+            return (
+                <tr className="hover:bg-blue-50/20 transition group">
+                    <td className="p-4 text-center"><input type="checkbox" className="rounded border-gray-300 shadow-sm" /></td>
+                    <td className="p-4">
+                        <div className="font-black text-gray-900 text-left text-[14px]">{name}</div>
+                        {type === 'pmax' ? (
+                            <div className="text-[10px] text-gray-400 mt-1 text-left leading-tight font-bold italic">
+                                추가 광고 소재를 수동으로 등록하시려면 다음으로 이동하세요. (To manually add more ad assets, please go to) <a href="https://ads.google.com" target="_blank" className="text-blue-500 hover:underline font-black">Google Ads Frontend</a>
+                            </div>
+                        ) : (
+                            <div className="text-[10px] text-gray-400 mt-1 text-left leading-tight font-bold italic">
+                                타겟팅을 수동으로 추가하시려면 다음으로 이동하세요. (To manually add audience targeting, please go to) <a href="https://ads.google.com" target="_blank" className="text-blue-500 hover:underline font-black">Google Ads Frontend</a>
+                            </div>
+                        )}
+                    </td>
+                    <td className="p-4 text-center relative" ref={dropRef}>
+                        <button onClick={() => setIsOpen(!isOpen)} className="inline-flex items-center justify-between gap-2 px-3 py-1.5 border border-gray-200 rounded-full bg-white text-[11px] font-black hover:border-blue-400 transition min-w-[115px] shadow-sm">
+                            <div className="flex items-center gap-1.5">
+                                <span className={`w-1.5 h-1.5 rounded-full ${status === 'Enabled' ? 'bg-green-500 animate-pulse shadow-[0_0_5px_rgba(34,197,94,0.5)]' : 'bg-gray-400'}`}></span> {status === 'Enabled' ? '활성화 (Enabled)' : '일시중지 (Paused)'}
+                            </div>
+                            <LucideIcon name="ChevronDown" size={12} className="text-gray-300" />
+                        </button>
+                        {isOpen && (
+                            <div className="absolute z-[100] left-1/2 -translate-x-1/2 mt-1 w-28 bg-white border border-gray-100 rounded-xl shadow-2xl overflow-hidden status-dropdown-enter">
+                                <div onClick={() => {setStatus('Enabled'); setIsOpen(false)}} className="p-2.5 text-[11px] hover:bg-gray-50 cursor-pointer text-left font-black border-b border-gray-50">활성화 (Enabled)</div>
+                                <div onClick={() => {setStatus('Paused'); setIsOpen(false)}} className="p-2.5 text-[11px] hover:bg-gray-50 cursor-pointer text-left font-black">일시중지 (Paused)</div>
+                            </div>
+                        )}
+                    </td>
+                    <td className="p-4 text-right font-mono text-gray-500">{cost}</td>
+                    <td className="p-4 text-right font-mono text-gray-500">{imp}</td>
+                    <td className="p-4 text-right font-mono text-gray-500">{clicks}</td>
+                    <td className="p-4 text-right font-mono text-gray-500">{ctr}</td>
+                    <td className="p-4 text-right font-mono text-gray-500">{orders}</td>
+                    <td className="p-4 text-right font-mono text-gray-900 font-bold">{gmv}</td>
+                    <td className="p-4 text-right font-mono text-green-600 font-black text-[14px]">{roas}</td>
+                    <td className="p-4 text-center sticky right-0 bg-white group-hover:bg-blue-50/20 border-l shadow-inner">
+                        <button onClick={onEdit} className="text-[#0050ff] hover:text-blue-800 font-black px-4 py-1.5 rounded border border-transparent hover:border-blue-100 transition text-[13px]">편집 (Edit)</button>
+                    </td>
+                </tr>
+            );
+        };
+
+        const CreationView = (props) => {
+            const [loadingPmax, setLoadingPmax] = useState(false);
+            const [loadingDg, setLoadingDg] = useState(false);
+            const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+            const handlePmaxSubmit = () => { setLoadingPmax(true); setTimeout(() => { setLoadingPmax(false); props.setPmaxActive(true); }, 1000); };
+            const handleDgSubmit = () => { setLoadingDg(true); setTimeout(() => { setLoadingDg(false); props.setDgActive(true); }, 1000); };
+            
+            const videoOptions = ["Summer Lookbook 2024", "Product Feature: Sneakers", "Brand Story", "Influencer Review", "Shorts Promotion"];
+
+            const toggleVideo = (v) => {
+                if(props.selectedVideos.includes(v)) props.setSelectedVideos(props.selectedVideos.filter(item => item !== v));
+                else if(props.selectedVideos.length < 5) props.setSelectedVideos([...props.selectedVideos, v]);
+            };
+
+            return (
+                <div className="flex flex-col animate-in slide-in-from-right-4 duration-300 text-left">
+                    <div className="bg-white border-b border-gray-100 px-10 py-5 sticky top-0 z-[55] flex items-center gap-10">
+                        <button onClick={props.onExit} className="text-xl font-bold text-gray-400 hover:text-blue-600 transition flex items-center gap-2 group">
+                            기존 캠페인 <span className="font-normal text-base text-gray-400">(Existing Campaigns)</span>
+                            <LucideIcon name="ChevronRight" size={18} className="group-hover:translate-x-1 transition text-gray-300" />
+                        </button>
+                        <div className="h-6 w-[1px] bg-gray-200"></div>
+                        <h1 className="text-xl font-black text-gray-800 uppercase tracking-tight">새 캠페인 생성 <span className="font-normal text-base text-gray-400 ml-1 tracking-tight">(Create New Campaign)</span></h1>
+                    </div>
+
+                    <header className="bg-[#0050ff] text-white relative overflow-hidden h-[220px]">
+                        <div className="max-w-7xl mx-auto px-10 h-full flex items-center relative z-10">
+                            <div className="flex-1 space-y-4 text-left">
+                                <h1 className="text-3xl font-black leading-tight tracking-tight">구글 광고로 더 많은 매출을 창출하세요<br/><span className="text-lg opacity-80 font-bold tracking-tight">(Drive more sales with Google Ads)</span></h1>
+                                <div className="flex items-center gap-3 pt-2">
+                                    <div className="bg-white p-2 rounded shadow-sm flex items-center justify-center"><GoogleIcons.G_Colorful /></div>
+                                    <div className="text-sm font-bold text-left tracking-tight">Google for <span className="opacity-80 font-black">Cafe24</span></div>
+                                </div>
+                            </div>
+
+                            <div className="relative w-[450px] h-full flex items-center justify-center max-lg:hidden translate-x-10">
+                                <div className="absolute right-[-60px] top-[-30px] w-[500px] h-[300px] bg-[#3373ff] rounded-full opacity-60"></div>
+                                <div className="relative z-20">
+                                    <div className="w-[140px] h-[160px] bg-[#e3f2fd] rounded-xl p-2 shadow-2xl border border-white/30 relative overflow-hidden">
+                                        <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=300" className="w-full h-full object-cover rounded-lg" />
+                                        <div className="absolute top-2 right-2 bg-green-900 bg-opacity-80 p-1 rounded shadow-sm flex items-center justify-center"><LucideIcon name="TrendingUp" size={10} className="text-green-400" /></div>
+                                    </div>
+                                    <div className="absolute bottom-[-15px] left-[10px] right-[-20px] bg-white rounded-lg p-2.5 shadow-2xl flex flex-col gap-1 border border-gray-100 z-30 text-left">
+                                        <div className="flex items-center gap-1.5"><GoogleIcons.G_Colorful /><div className="h-2 bg-[#4285F4] rounded-full w-10"></div></div>
+                                        <div className="flex gap-0.5 text-[#fbc02d] text-[9px] font-black">★ ★ ★ ★ ★</div>
+                                    </div>
+                                </div>
+                                <div className="absolute top-[40px] left-[70px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30 scale-110"><GoogleIcons.YouTube /></div>
+                                <div className="absolute top-[15px] left-[140px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Gmail /></div>
+                                <div className="absolute top-[100px] left-[110px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Maps /></div>
+                                <div className="absolute top-[160px] left-[55px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Sparkle /></div>
+                                <div className="absolute bottom-[20px] left-[130px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30 flex items-center justify-center font-black text-blue-500 text-[10px] w-7 h-7">G</div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <div className="max-w-7xl mx-auto px-10 py-8 text-left">
+                        <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-xl flex flex-col md:flex-row items-center gap-10 relative overflow-hidden">
+                            <div className="flex-1 space-y-3 relative z-10">
+                                <h2 className="text-xl font-bold text-gray-800">전체 퍼널 통합 전략 <span className="text-lg text-gray-500 font-normal">(Full Funnel Synergy Strategy)</span><br /><span className="text-[#0050ff] text-lg font-black uppercase tracking-tight">Performance Max + Demand Gen</span></h2>
+                                <p className="text-gray-500 font-medium max-w-2xl text-[13px] leading-relaxed">이미 구매할 준비가 된 고객은 Performance Max로 잡고, 유튜브와 소셜 채널을 통해 새로운 잠재 고객의 눈길을 끄는 Demand Gen을 결합하세요. <br/>(Capture ready-to-buy customers with Performance Max and attract new potential customers through YouTube and social channels with Demand Gen.)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <main className="max-w-7xl mx-auto px-10 space-y-12 pb-20">
+                        {/* PERFORMANCE MAX SECTION */}
+                        <section className={`relative transition-all duration-500 ${props.pmaxActive ? 'pointer-events-none opacity-60 scale-[0.99]' : ''}`}>
+                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden grid grid-cols-10 min-h-[480px]">
+                                <div className="col-span-6 p-10 space-y-8 border-r border-gray-50 text-left">
+                                    <div className="space-y-1.5 text-left">
+                                        <h2 className="text-lg font-bold text-[#0050ff] uppercase flex items-center gap-2"><LucideIcon name="Zap" className="text-blue-600" /> 퍼포먼스 최대화 캠페인 (Performance Max)</h2>
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <InputGroup label="캠페인 이름 (Campaign Name)" value={props.pmaxName} onChange={props.setPmaxName} disabled={props.pmaxActive} />
+                                        <InputGroup label="일일 예산 (Daily Budget)" value={props.pmaxBudget} onChange={props.setPmaxBudget} type="number" prefix="₩" disabled={props.pmaxActive} 
+                                            footer={<div className="flex justify-between mt-2 text-[10px] font-bold tracking-tight uppercase"><span className="text-gray-400">최소(Min): ₩15,000</span><span className="text-blue-600">권장(Recommended): ₩70,000</span></div>}
+                                        />
+                                    </div>
+                                    <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100 text-[12px] text-blue-900 font-bold italic leading-relaxed shadow-sm">구글 AI가 모든 상품을 분석하여 전 채널에 광고를 자동 노출합니다. 수동 설정이 필요 없습니다. <br/>(Google AI analyzes all products and automatically displays ads across all channels. No manual setup required.)</div>
+                                    <div className="pt-8 flex items-center justify-between border-t border-gray-100">
+                                        <a href="#" className="text-gray-400 font-black text-[11px] uppercase tracking-tight flex items-center gap-1.5 hover:text-blue-600 transition-colors"><LucideIcon name="ExternalLink" size={12} /> 퍼포먼스 최대화 캠페인 도움말 (Performance Max Help)</a>
+                                        <button onClick={handlePmaxSubmit} className={`px-10 py-3.5 rounded-xl font-black text-xs transition-all shadow-xl min-w-[240px] ${props.pmaxActive ? 'bg-gray-200 text-gray-400 shadow-none' : 'bg-[#0050ff] text-white hover:bg-blue-700 active:scale-95'}`}>
+                                            {loadingPmax ? "Processing..." : props.pmaxActive ? "제출 완료 (Submitted)" : "캠페인 제출하기 (Submit Campaign)"}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="col-span-4 bg-[#f1f3f4] p-10 flex flex-col items-center justify-center border-l border-gray-100">
+                                    <div className="w-full max-w-[240px] bg-white rounded-[32px] border-[6px] border-gray-800 shadow-2xl aspect-[9/18] overflow-hidden flex flex-col shrink-0">
+                                        <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-2"><GoogleIcons.G_Colorful /><div className="h-1.5 bg-gray-100 rounded-full w-20"></div></div>
+                                        <div className="p-3 bg-gray-50 flex-1 space-y-3">
+                                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                                                <div className="aspect-square relative"><img src={props.images[0].url} className="w-full h-full object-cover" /><div className="absolute top-1 left-1 bg-white/90 text-[7px] font-black px-1 rounded shadow-sm border border-gray-100">Sponsored</div></div>
+                                                <div className="p-2 space-y-1 text-left">
+                                                    <div className="text-[10px] font-bold text-gray-900 leading-tight">Comfort Sneakers - Limited Edition</div>
+                                                    <div className="flex items-center gap-1"><span className="text-[10px] font-black text-gray-900">₩70,000</span><span className="text-[8px] text-gray-400 line-through">₩95,000</span></div>
+                                                    <div className="text-[8px] text-gray-500">Your Store Name</div>
+                                                    <div className="flex gap-0.5 text-[#fbc02d] text-[7px]">★★★★★ <span className="text-gray-400">(42)</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="mt-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Performance Max Preview</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* DEMAND GEN SECTION */}
+                        <section className={`relative transition-all duration-500 ${props.dgActive ? 'pointer-events-none opacity-60 scale-[0.99]' : ''}`}>
+                            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden grid grid-cols-10 min-h-[600px]">
+                                <div className="col-span-6 p-10 space-y-10 border-r border-gray-50 text-left">
+                                    <div className="space-y-1.5 text-left">
+                                        <h2 className="text-lg font-bold text-indigo-700 uppercase flex items-center gap-2 tracking-tight"><LucideIcon name="Video" className="text-indigo-600" /> 디맨드 제너레이션 캠페인 (Demand Gen)</h2>
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-8">
+                                        <InputGroup label="캠페인 이름 (Campaign Name)" value={props.dgName} onChange={props.setDgName} disabled={props.dgActive} />
+                                        <InputGroup label="일일 예산 (Daily Budget)" value={props.dgBudget} onChange={props.setDgBudget} type="number" prefix="₩" disabled={props.dgActive} />
+                                    </div>
+                                    <div className="space-y-8">
+                                        <DynamicInputList label="헤드라인 (Headline)" data={props.headlines} setData={props.setHeadlines} disabled={props.dgActive} maxLength={40} placeholder="잠재 고객의 관심을 끄는 짧은 문구 (Catchy short text)" />
+                                        <DynamicInputList label="긴 헤드라인 (Long Headline)" data={props.longHeadlines} setData={props.setLongHeadlines} disabled={props.dgActive} maxLength={90} placeholder="상품의 장점을 자세히 설명하는 문구 (Detailed product features)" />
+                                        <DynamicInputList label="설명 (Description)" data={props.descriptions} setData={props.setDescriptions} disabled={props.dgActive} maxLength={90} placeholder="구매를 유도하는 상세 정보 (Detailed info to drive purchase)" />
+                                        
+                                        <div className="grid grid-cols-2 gap-8 pt-6 border-t border-gray-100">
+                                            <div className="space-y-4">
+                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">이미지 에셋 (Image Assets) {props.images.length}/20</label>
+                                                <div className="grid grid-cols-4 gap-2">
+                                                    {props.images.map(img => <div key={img.id} className="aspect-square bg-gray-100 rounded-lg overflow-hidden border border-gray-200 shadow-sm"><img src={img.url} className="w-full h-full object-cover" /></div>)}
+                                                    <button className="aspect-square border border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-300 hover:bg-gray-50 transition">+</button>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4 relative">
+                                                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">동영상 에셋 (Video Assets) {props.selectedVideos.length}/5</label>
+                                                <div onClick={() => !props.dgActive && setIsDropdownOpen(!isDropdownOpen)} className="w-full px-4 py-2.5 border rounded-xl flex items-center justify-between cursor-pointer bg-white text-xs font-bold text-gray-600 shadow-sm">
+                                                    <div className="truncate">{props.selectedVideos.length === 0 ? "동영상 선택 (Select Videos)" : props.selectedVideos.join(", ")}</div>
+                                                    <LucideIcon name="ChevronDown" size={14} />
+                                                </div>
+                                                {isDropdownOpen && !props.dgActive && (
+                                                    <div className="absolute z-[60] left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                                        {videoOptions.map(v => (
+                                                            <div key={v} onClick={() => toggleVideo(v)} className={`p-3 text-[11px] font-bold cursor-pointer transition-colors border-b last:border-0 flex justify-between items-center ${props.selectedVideos.includes(v) ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50 text-gray-700'}`}>
+                                                                {v} {props.selectedVideos.includes(v) && <LucideIcon name="Check" size={12} />}
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                                <div className="p-4 bg-indigo-50/50 rounded-xl border border-indigo-100 text-[10px] font-black leading-tight text-left space-y-2 mt-4 text-indigo-900 shadow-sm">
+                                                    <div className="flex items-center gap-2">유튜브 동영상 에셋 (Video Assets on YouTube)</div>
+                                                    <p className="font-medium">동영상이 없으면 <strong>구글 AI가 자동 생성</strong>합니다. <br/>(Google AI will automatically generate a video if none is provided.)</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="pt-8 flex items-center justify-between border-t border-gray-100">
+                                        <a href="#" className="text-gray-400 font-black text-[11px] uppercase tracking-tight flex items-center gap-1.5 hover:text-indigo-600 transition-colors"><LucideIcon name="ExternalLink" size={12} /> 디맨드 제너레이션 도움말 (Demand Gen Help)</a>
+                                        <button onClick={handleDgSubmit} className={`px-10 py-3.5 bg-indigo-600 text-white rounded-xl font-black text-xs shadow-xl hover:bg-indigo-700 transition min-w-[240px] ${props.dgActive ? 'opacity-50' : ''}`}>
+                                            {loadingDg ? "Processing..." : props.dgActive ? "제출 완료 (Submitted)" : "캠페인 제출하기 (Submit Campaign)"}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* --- DUAL DEMAND GEN PREVIEW --- */}
+                                <div className="col-span-4 bg-[#f8f9fa] p-8 flex flex-col items-center gap-10 border-l border-gray-100 overflow-y-auto max-h-[1000px] hide-scrollbar">
+                                    
+                                    {/* 1. In-stream Horizontal Preview */}
+                                    <div className="w-[220px] aspect-[9/18.5] bg-white rounded-[36px] border-[6px] border-[#333] shadow-2xl relative overflow-hidden flex flex-col shrink-0">
+                                        <div className="h-6 flex items-center justify-between px-6 py-1 bg-white">
+                                            <span className="text-[7px] text-black font-bold">9:41</span>
+                                            <div className="flex gap-1 items-center">
+                                                <div className="w-2 h-1 bg-black opacity-20 rounded-full"></div>
+                                                <div className="w-2.5 h-1.5 bg-black/40 rounded-sm"></div>
+                                            </div>
+                                        </div>
+                                        <div className="aspect-video bg-black relative shrink-0">
+                                            <img src={props.images[0].url} className="w-full h-full object-cover opacity-80" />
+                                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-[8px] px-2 py-1 rounded border border-white/20">Skip ad ▷</div>
+                                            <div className="absolute top-2 left-2 bg-black/40 px-2 py-1 rounded text-white text-[9px] font-bold">Ad · 1 of 2</div>
+                                        </div>
+                                        <div className="p-3 flex-1 flex flex-col justify-between overflow-hidden">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2 text-left">
+                                                    <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-black text-xs">C</div>
+                                                    <div className="text-left">
+                                                        <h3 className="text-[10px] font-black text-gray-900 leading-tight">내 쇼핑몰 (Your Store)</h3>
+                                                        <p className="text-[8px] text-gray-500">www.example.com</p>
+                                                    </div>
+                                                </div>
+                                                <LucideIcon name="MoreVertical" size={12} className="text-gray-400" />
+                                            </div>
+                                            <div className="space-y-1.5 text-left">
+                                                <p className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Top Products</p>
+                                                <div className="grid grid-cols-2 gap-1.5">
+                                                    {props.images.slice(0, 4).map((img, i) => (
+                                                        <div key={i} className="aspect-square bg-gray-50 rounded border border-gray-100 p-0.5"><img src={img.url} className="w-full h-full object-cover rounded-[2px]" /></div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                            <button className="w-full py-2 bg-[#0050ff] text-white text-[10px] font-black rounded-lg shadow-md mt-2">Shop now</button>
+                                        </div>
+                                    </div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">In-stream Preview</p>
+                                    
+                                    {/* 2. Vertical Shorts Preview */}
+                                    <div className="w-[220px] aspect-[9/18.5] bg-black rounded-[36px] border-[6px] border-[#333] shadow-2xl relative overflow-hidden shrink-0">
+                                        <div className="h-6 flex items-center justify-between px-6 py-1">
+                                            <span className="text-[7px] text-white font-bold">9:41</span>
+                                        </div>
+                                        <img src={props.images[0].url} className="w-full h-full object-cover opacity-70" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30"></div>
+                                        <div className="absolute right-3 bottom-32 flex flex-col gap-4 items-center">
+                                            <div className="flex flex-col items-center"><LucideIcon name="ThumbsUp" size={18} className="text-white" /><span className="text-[8px] text-white font-bold">12K</span></div>
+                                            <div className="flex flex-col items-center"><LucideIcon name="ThumbsDown" size={18} className="text-white" /><span className="text-[8px] text-white font-bold">Dislike</span></div>
+                                            <div className="flex flex-col items-center"><LucideIcon name="MessageSquare" size={18} className="text-white" /><span className="text-[8px] text-white font-bold">123</span></div>
+                                            <div className="flex flex-col items-center"><LucideIcon name="Share2" size={18} className="text-white" /><span className="text-[8px] text-white font-bold">Share</span></div>
+                                        </div>
+                                        <div className="absolute bottom-0 left-0 right-0 p-4 z-10 flex flex-col gap-3 text-left">
+                                            <div className="flex items-center gap-2"><span className="bg-[#fbbc05] text-black text-[8px] font-black px-1.5 py-0.5 rounded-sm">Ad</span><div className="w-5 h-5 rounded-full bg-indigo-600 border border-white/20 flex items-center justify-center text-white text-[6px] font-bold">C</div><span className="text-white text-[10px] font-black tracking-tight">내 쇼핑몰 (Your Store)</span></div>
+                                            <div className="space-y-1"><h4 className="text-white text-[12px] font-black leading-tight line-clamp-1">{props.headlines[0] || "헤드라인 (Headline)"}</h4><p className="text-white/80 text-[10px] line-clamp-2 leading-snug">{props.descriptions[0] || "설명 텍스트가 여기에 표시됩니다 (Description goes here)."}</p></div>
+                                            <div className="flex gap-2 pb-1 overflow-hidden">{props.images.map((img, i) => (<div key={i} className="w-10 h-10 rounded bg-white/20 backdrop-blur-md border border-white/20 overflow-hidden shrink-0"><img src={img.url} className="w-full h-full object-cover" /></div>))}</div>
+                                            <button className="w-full py-2 bg-white/10 backdrop-blur-lg text-white border border-white/30 rounded-lg text-[10px] font-black uppercase tracking-tight flex items-center justify-center gap-2">Shop now <LucideIcon name="ExternalLink" size={10} /></button>
+                                        </div>
+                                        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600/60 z-20"></div>
+                                    </div>
+                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Vertical Shorts Preview</p>
+                                </div>
+                            </div>
+                        </section>
+                    </main>
+                </div>
+            );
+        };
+
+        const InputGroup = ({ label, value, onChange, type = "text", prefix, disabled, footer }) => (
+            <div className="w-full text-left">
+                <label className="block text-[10px] font-black mb-2 text-gray-400 tracking-widest uppercase">{label}</label>
+                <div className="relative">
+                    {prefix && <span className="absolute left-4 top-[13px] text-gray-400 font-bold text-sm">{prefix}</span>}
+                    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} className={`w-full ${prefix ? 'pl-8' : 'px-4'} py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm ${disabled ? 'bg-gray-50 text-gray-400 border-gray-200 shadow-none' : 'bg-white font-bold text-sm text-gray-800'}`} />
+                </div>
+                {footer}
+            </div>
+        );
+
+        const DynamicInputList = ({ label, data, setData, disabled, maxLength = 40, placeholder = "" }) => {
+            const add = () => { if(data.length < 5) setData([...data, '']); };
+            const remove = (idx) => { if(data.length > 1) setData(data.filter((_, i) => i !== idx)); };
+            const update = (idx, val) => { const next = [...data]; next[idx] = val; setData(next); };
+            return (
+                <div className="space-y-4 text-left">
+                    <div className="flex justify-between items-end">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</label>
+                        <span className="text-[9px] text-gray-300 font-bold">{data.length}/5</span>
+                    </div>
+                    {data.map((item, idx) => (
+                        <div key={idx} className="flex gap-2.5">
+                            <div className="relative flex-1">
+                                <input 
+                                    type="text" 
+                                    value={item} 
+                                    onChange={(e) => update(idx, e.target.value)} 
+                                    disabled={disabled} 
+                                    placeholder={placeholder} 
+                                    maxLength={maxLength}
+                                    className={`w-full px-5 py-3 border border-gray-300 rounded-2xl text-xs outline-none transition-all shadow-sm ${disabled ? 'bg-gray-50' : 'bg-white focus:ring-2 focus:ring-indigo-500 font-bold'}`} 
+                                />
+                                <span className="absolute right-4 bottom-2.5 text-[8px] text-gray-400 font-bold">{item.length}/{maxLength}</span>
+                            </div>
+                            {!disabled && data.length > 1 && <button onClick={() => remove(idx)} className="text-gray-300 hover:text-red-500 font-bold transition-all p-2"><LucideIcon name="X" size={16} /></button>}
+                        </div>
+                    ))}
+                    {!disabled && data.length < 5 && <button onClick={add} className="w-full py-2.5 border-2 border-dashed border-gray-100 rounded-2xl text-[10px] text-indigo-500 font-black uppercase tracking-tight shadow-sm hover:bg-indigo-50 transition-colors">+ 필드 추가 (Add Field)</button>}
+                </div>
+            );
+        };
+
+        const container = document.getElementById('root');
+        const root = ReactDOM.createRoot(container);
+        root.render(<App />);
+    </script>
+</body>
+</html>
