@@ -112,21 +112,13 @@
             const [view, setView] = useState('home'); 
             const [pmaxName, setPmaxName] = useState('PMAX 1');
             const [pmaxBudget, setPmaxBudget] = useState(70000);
-            const [dgName, setDgName] = useState('Demand Gen 1');
-            const [dgBudget, setDgBudget] = useState(70000);
             const [pmaxActive, setPmaxActive] = useState(false);
-            const [dgActive, setDgActive] = useState(false);
-            const [headlines, setHeadlines] = useState(['']);
-            const [longHeadlines, setLongHeadlines] = useState(['']);
-            const [descriptions, setDescriptions] = useState(['']);
-            const [selectedVideos, setSelectedVideos] = useState([]);
             const [images, setImages] = useState([
                 { id: 1, url: 'https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400', selected: true },
                 { id: 2, url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400', selected: true },
                 { id: 3, url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400', selected: false },
             ]);
 
-            // Popup state for exit confirmation
             const [isExitPopupOpen, setIsExitPopupOpen] = useState(false);
             const [pendingTargetView, setPendingTargetView] = useState(null);
 
@@ -140,20 +132,14 @@
             };
 
             const confirmNavigation = () => {
-                if (pendingTargetView) {
-                    setView(pendingTargetView);
-                }
+                if (pendingTargetView) setView(pendingTargetView);
                 setIsExitPopupOpen(false);
                 setPendingTargetView(null);
             };
 
             const navigateToCreation = (type = 'new', campaignName = '') => {
-                if (type === 'edit') {
-                    if (campaignName.includes('Demand Gen')) setDgName(campaignName);
-                    else setPmaxName(campaignName);
-                } else {
-                    setHeadlines(['']); setLongHeadlines(['']); setDescriptions(['']); setSelectedVideos([]);
-                }
+                if (type === 'edit') setPmaxName(campaignName);
+                else { setPmaxName('PMAX 1'); setPmaxBudget(70000); }
                 setView('creation');
             };
 
@@ -179,26 +165,14 @@
                                     </span>
                                 </p>
                                 <div className="flex gap-3">
-                                    {/* Primary Button: Stay */}
-                                    <button 
-                                        onClick={() => setIsExitPopupOpen(false)}
-                                        className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg shadow-blue-200 transition active:scale-95"
-                                    >
-                                        계속하기 (Stay)
-                                    </button>
-                                    {/* Secondary Button: Quit */}
-                                    <button 
-                                        onClick={confirmNavigation}
-                                        className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition active:scale-95"
-                                    >
-                                        그만두기 (Quit)
-                                    </button>
+                                    <button onClick={() => setIsExitPopupOpen(false)} className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg shadow-blue-200 transition active:scale-95">계속하기 (Stay)</button>
+                                    <button onClick={confirmNavigation} className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition active:scale-95">그만두기 (Quit)</button>
                                 </div>
                             </div>
                         </div>
                     )}
 
-                    {/* --- SIDEBAR --- */}
+                    {/* --- SIDEBAR (EXACT V2 RESTORED) --- */}
                     <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 text-left">
                         <div className="sidebar-gradient relative">
                             <div className="absolute top-2 right-4 text-white text-[10px] font-bold bg-black bg-opacity-20 px-2 py-1 rounded tracking-tighter uppercase">
@@ -265,15 +239,8 @@
                                 onExit={() => requestNavigation('reporting')}
                                 pmaxName={pmaxName} setPmaxName={setPmaxName}
                                 pmaxBudget={pmaxBudget} setPmaxBudget={setPmaxBudget}
-                                dgName={dgName} setDgName={setDgName}
-                                dgBudget={dgBudget} setDgBudget={setDgBudget}
-                                headlines={headlines} setHeadlines={setHeadlines}
-                                longHeadlines={longHeadlines} setLongHeadlines={setLongHeadlines}
-                                descriptions={descriptions} setDescriptions={setDescriptions}
                                 pmaxActive={pmaxActive} setPmaxActive={setPmaxActive}
-                                dgActive={dgActive} setDgActive={setDgActive}
-                                images={images} setImages={setImages}
-                                selectedVideos={selectedVideos} setSelectedVideos={setSelectedVideos}
+                                images={images}
                             />
                         )}
                     </main>
@@ -281,261 +248,133 @@
             );
         };
 
-        // --- View: Home ---
-        const HomeView = ({ onNavigate }) => {
-            return (
-                <div className="p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300 bg-[#f0f2f5] min-h-full text-left">
-                    <div className="relative h-60 rounded-3xl overflow-hidden shadow-xl banner-glow flex items-center px-12 group cursor-pointer" onClick={onNavigate}>
-                        <div className="z-10 space-y-3 text-left">
-                            <h2 className="text-3xl font-black text-white leading-tight text-left">당신의 상품, <br/>구글의 모든 곳에. <br/><span className="text-lg font-medium opacity-80">(Your products, everywhere on Google.)</span></h2>
-                            <button className="bg-white text-indigo-700 px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-all">구글 채널 시작하기 (Start Google Channel)</button>
-                        </div>
-                        <div className="absolute right-20 inset-y-0 flex items-center justify-center w-1/2 pointer-events-none">
-                            <div className="relative w-56 h-56">
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 floating-icon" style={{animationDelay: '0s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.YouTube /></div></div>
-                                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 floating-icon" style={{animationDelay: '0.5s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.Gmail /></div></div>
-                                <div className="absolute left-0 top-1/2 -translate-y-1/2 floating-icon" style={{animationDelay: '1s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.G_Colorful /></div></div>
-                                <div className="absolute right-0 top-1/2 -translate-y-1/2 floating-icon" style={{animationDelay: '1.5s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.Maps /></div></div>
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border border-white/30 flex items-center justify-center shadow-inner"><LucideIcon name="ShoppingBag" size={28} className="text-white" /></div>
-                                </div>
-                                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="0.5" strokeDasharray="4 4" /></svg>
-                            </div>
-                        </div>
+        // --- View: Home (EXACT V2 RESTORED) ---
+        const HomeView = ({ onNavigate }) => (
+            <div className="p-8 max-w-7xl mx-auto space-y-6 animate-in fade-in duration-300 bg-[#f0f2f5] min-h-full text-left">
+                <div className="relative h-60 rounded-3xl overflow-hidden shadow-xl banner-glow flex items-center px-12 group cursor-pointer" onClick={onNavigate}>
+                    <div className="z-10 space-y-3 text-left">
+                        <h2 className="text-3xl font-black text-white leading-tight">당신의 상품, <br/>구글의 모든 곳에. <br/><span className="text-lg font-medium opacity-80">(Your products, everywhere on Google.)</span></h2>
+                        <button className="bg-white text-indigo-700 px-8 py-3 rounded-full text-sm font-black shadow-lg hover:scale-105 transition-all">구글 채널 시작하기 (Start Google Channel)</button>
                     </div>
-
-                    <div className="grid grid-cols-12 gap-6">
-                        <div className="col-span-8 bg-white rounded-xl border border-gray-200 p-8 flex items-center shadow-sm">
-                            <div className="flex items-center gap-6">
-                                <div className="w-16 h-16 rounded-full bg-pink-500 flex items-center justify-center text-white text-2xl font-black shadow-inner">C</div>
-                                <div className="text-left">
-                                    <h3 className="text-lg font-bold text-gray-900">Calvin Shen</h3>
-                                    <p className="text-sm text-gray-500">calvinshen.900209@gmail.com</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="col-span-4 bg-white rounded-xl border border-gray-200 p-8 flex flex-col items-center justify-center shadow-sm relative group">
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="w-8 h-8"><GoogleIcons.G_Colorful /></div>
-                                <span className="text-xs font-black text-gray-400 tracking-tighter uppercase">Google Partner (구글 파트너)</span>
-                            </div>
-                            <div className="absolute top-3 right-3 text-blue-400"><LucideIcon name="ExternalLink" size={12} /></div>
-                        </div>
-
-                        <div className="col-span-12 bg-white rounded-2xl border-2 border-indigo-100 shadow-xl overflow-hidden flex">
-                            <div className="flex-1 p-10 text-left space-y-6">
-                                <div className="space-y-1 text-left">
-                                    <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2 text-left">구글 채널 설정이 아직 완료되지 않았습니다! <span className="text-base font-normal text-gray-400 text-left">(Setup is incomplete!)</span></h3>
-                                    <p className="text-sm text-gray-500 text-left">GMC와 Ads 계정은 연결되었으나, 쇼핑 캠페인을 생성하여 광고를 시작해야 매출이 발생합니다.</p>
-                                </div>
-                                <div className="flex items-center gap-10">
-                                    <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm"><LucideIcon name="CheckCircle2" size={18} /> GMC 연결됨 (GMC Connected)</div>
-                                    <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm"><LucideIcon name="CheckCircle2" size={18} /> Ads 연결됨 (Ads Connected)</div>
-                                    <div className="flex items-center gap-2 text-red-500 font-black text-sm animate-pulse"><LucideIcon name="AlertCircle" size={18} /> 캠페인 미생성 (Campaign Missing)</div>
-                                </div>
-                                <div className="h-4 w-full bg-gray-100 rounded-full overflow-hidden p-0.5 border border-gray-200">
-                                    <div className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-1000" style={{width: '75%'}}></div>
-                                </div>
-                                <div className="pt-2 flex items-center gap-6">
-                                    <button onClick={onNavigate} className="bg-indigo-600 text-white px-12 py-4 rounded-xl font-black shadow-xl hover:bg-indigo-700 hover:scale-105 active:scale-95 transition flex items-center gap-3">
-                                        지금 쇼핑 캠페인 생성하기 (Create Campaign Now) <LucideIcon name="ArrowRight" size={20} />
-                                    </button>
-                                    <div className="flex flex-col text-left">
-                                        <span className="text-indigo-600 font-black text-xs text-left">리워드 혜택 (Reward Eligible)</span>
-                                        <span className="text-gray-400 text-[10px] font-bold tracking-tight text-left">캠페인 생성 즉시 600,000원 리워드 혜택이 적용됩니다.</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="w-[320px] bg-indigo-50/20 flex items-center justify-center p-8 border-l border-indigo-50">
-                                <div className="bg-white rounded-2xl p-6 shadow-xl border border-indigo-50 text-center space-y-4 relative overflow-hidden group hover:border-amber-300 transition-all cursor-pointer" onClick={onNavigate}>
-                                    <LucideIcon name="Gift" size={40} className="text-amber-500 mx-auto" />
-                                    <div className="space-y-1">
-                                        <div className="bg-emerald-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full w-fit mx-auto">최대 (Max)</div>
-                                        <div className="text-gray-900 text-3xl font-black tracking-tighter">600,000원</div>
-                                        <div className="text-indigo-600 text-xs font-bold">광고비 리워드 (Ad Credit Reward)</div>
-                                    </div>
-                                    <div className="h-px bg-gray-100 w-full"></div>
-                                    <p className="text-[10px] text-gray-400 font-medium">60일 이내 광고 지출 시 <br/>크레딧으로 환급받으세요.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-span-12 bg-white rounded-xl border border-gray-200 p-10 space-y-8 shadow-sm">
-                            <div className="text-left space-y-2 text-left">
-                                <h3 className="text-lg font-bold text-gray-900 text-left">상품 피드 현황 (Product feed overview)</h3>
-                                <p className="text-sm text-gray-500 max-w-4xl text-left">승인된 제품은 구글의 모든 채널에서 홍보할 수 있습니다. <span className="text-blue-600 underline cursor-pointer ml-1 font-bold">Merchant Center 바로가기 (Go to GMC) <LucideIcon name="ExternalLink" size={12} className="inline" /></span></p>
-                            </div>
-                            <div className="grid grid-cols-3 divide-x divide-gray-100 border-t pt-8">
-                                <div className="px-6 text-left space-y-4">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-gray-700 text-left"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200 text-left"></div> 승인됨 (Approved)</div>
-                                    <div className="text-4xl font-black text-gray-900 flex items-center gap-2 cursor-pointer hover:text-emerald-600 transition-colors text-left text-left">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div>
-                                </div>
-                                <div className="px-6 text-left space-y-4">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-gray-700 text-left"><div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm shadow-amber-200 text-left"></div> 대기 중 (Pending)</div>
-                                    <div className="text-4xl font-black text-gray-900 flex items-center gap-2 cursor-pointer hover:text-amber-600 transition-colors text-left text-left">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div>
-                                </div>
-                                <div className="px-6 text-left space-y-4">
-                                    <div className="flex items-center gap-2 text-sm font-bold text-gray-700 text-left"><div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm shadow-red-200 text-left"></div> 비승인됨 (Disapproved)</div>
-                                    <div className="text-4xl font-black text-gray-900 flex items-center gap-2 cursor-pointer hover:text-red-600 transition-colors text-left text-left">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div>
-                                </div>
-                            </div>
+                    <div className="absolute right-20 inset-y-0 flex items-center justify-center w-1/2 pointer-events-none">
+                        <div className="relative w-56 h-56">
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 floating-icon" style={{animationDelay: '0s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.YouTube /></div></div>
+                            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 floating-icon" style={{animationDelay: '0.5s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.Gmail /></div></div>
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 floating-icon" style={{animationDelay: '1s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.G_Colorful /></div></div>
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 floating-icon" style={{animationDelay: '1.5s'}}><div className="w-12 h-12 bg-white rounded-2xl shadow-xl flex items-center justify-center p-2"><GoogleIcons.Maps /></div></div>
+                            <div className="absolute inset-0 flex items-center justify-center"><div className="w-16 h-16 bg-white/20 backdrop-blur-md rounded-full border border-white/30 flex items-center justify-center shadow-inner"><LucideIcon name="ShoppingBag" size={28} className="text-white" /></div></div>
+                            <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="white" strokeWidth="0.5" strokeDasharray="4 4" /></svg>
                         </div>
                     </div>
                 </div>
-            );
-        };
 
-        // --- View: Settings ---
+                <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-8 bg-white rounded-xl border border-gray-200 p-8 flex items-center shadow-sm">
+                        <div className="flex items-center gap-6"><div className="w-16 h-16 rounded-full bg-pink-500 flex items-center justify-center text-white text-2xl font-black shadow-inner">C</div><div><h3 className="text-lg font-bold text-gray-900">Calvin Shen</h3><p className="text-sm text-gray-500">calvinshen.900209@gmail.com</p></div></div>
+                    </div>
+                    <div className="col-span-4 bg-white rounded-xl border border-gray-200 p-8 flex flex-col items-center justify-center shadow-sm relative group">
+                        <div className="flex flex-col items-center gap-2"><div className="w-8 h-8"><GoogleIcons.G_Colorful /></div><span className="text-xs font-black text-gray-400 tracking-tighter uppercase">Google Partner (구글 파트너)</span></div><div className="absolute top-3 right-3 text-blue-400"><LucideIcon name="ExternalLink" size={12} /></div>
+                    </div>
+
+                    <div className="col-span-12 bg-white rounded-2xl border-2 border-indigo-100 shadow-xl overflow-hidden flex">
+                        <div className="flex-1 p-10 text-left space-y-6">
+                            <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">구글 채널 설정이 아직 완료되지 않았습니다! <span className="text-base font-normal text-gray-400">(Setup is incomplete!)</span></h3>
+                            <p className="text-sm text-gray-500">GMC와 Ads 계정은 연결되었으나, 쇼핑 캠페인을 생성하여 광고를 시작해야 매출이 발생합니다.</p>
+                            <div className="flex items-center gap-10">
+                                <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm"><LucideIcon name="CheckCircle2" size={18} /> GMC 연결됨 (GMC Connected)</div>
+                                <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm"><LucideIcon name="CheckCircle2" size={18} /> Ads 연결됨 (Ads Connected)</div>
+                                <div className="flex items-center gap-2 text-red-500 font-black text-sm animate-pulse"><LucideIcon name="AlertCircle" size={18} /> 캠페인 미생성 (Campaign Missing)</div>
+                            </div>
+                            <div className="h-4 w-full bg-gray-100 rounded-full overflow-hidden p-0.5 border border-gray-200"><div className="h-full bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full transition-all duration-1000" style={{width: '75%'}}></div></div>
+                            <button onClick={onNavigate} className="bg-indigo-600 text-white px-12 py-4 rounded-xl font-black shadow-xl hover:bg-indigo-700 hover:scale-105 active:scale-95 transition flex items-center gap-3">지금 쇼핑 캠페인 생성하기 (Create Campaign Now) <LucideIcon name="ArrowRight" size={20} /></button>
+                        </div>
+                        <div className="w-[320px] bg-indigo-50/20 flex items-center justify-center p-8 border-l border-indigo-50">
+                            <div className="bg-white rounded-2xl p-6 shadow-xl border border-indigo-50 text-center space-y-4 cursor-pointer" onClick={onNavigate}><LucideIcon name="Gift" size={40} className="text-amber-500 mx-auto" /><div className="text-gray-900 text-3xl font-black tracking-tighter">600,000원</div><div className="text-indigo-600 text-xs font-bold">광고비 리워드 (Ad Credit Reward)</div></div>
+                        </div>
+                    </div>
+
+                    <div className="col-span-12 bg-white rounded-xl border border-gray-200 p-10 space-y-8 shadow-sm">
+                        <div className="text-left space-y-2"><h3 className="text-lg font-bold text-gray-900">상품 피드 현황 (Product feed overview)</h3><p className="text-sm text-gray-500">승인된 제품은 구글의 모든 채널에서 홍보할 수 있습니다. <span className="text-blue-600 underline cursor-pointer ml-1 font-bold">Merchant Center 바로가기 (Go to GMC) <LucideIcon name="ExternalLink" size={12} className="inline" /></span></p></div>
+                        <div className="grid grid-cols-3 divide-x divide-gray-100 border-t pt-8">
+                            <div className="px-6 space-y-4"><div className="flex items-center gap-2 text-sm font-bold text-gray-700"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></div> 승인됨 (Approved)</div><div className="text-4xl font-black text-gray-900 flex items-center gap-2 hover:text-emerald-600 transition-colors cursor-pointer">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div></div>
+                            <div className="px-6 space-y-4"><div className="flex items-center gap-2 text-sm font-bold text-gray-700"><div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm shadow-amber-200"></div> 대기 중 (Pending)</div><div className="text-4xl font-black text-gray-900 flex items-center gap-2 hover:text-amber-600 transition-colors cursor-pointer">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div></div>
+                            <div className="px-6 space-y-4"><div className="flex items-center gap-2 text-sm font-bold text-gray-700"><div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm shadow-red-200"></div> 비승인됨 (Disapproved)</div><div className="text-4xl font-black text-gray-900 flex items-center gap-2 hover:text-red-600 transition-colors cursor-pointer">0 <LucideIcon name="ChevronRight" size={24} className="text-gray-200" /></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- View: Settings (EXACT V2 RESTORED) ---
         const SettingsView = ({ onNext }) => {
             const [conversionOn, setConversionOn] = useState(false);
-
             const SettingCard = ({ title, englishTitle, children, rightAction, icon }) => (
-                <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-4 overflow-hidden text-left text-left text-left">
-                    <div className="px-8 py-6 flex justify-between items-start">
-                        <div className="flex-1 text-left">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4 text-left">{title} <span className="text-sm font-normal text-gray-400 ml-1 text-left">({englishTitle})</span></h3>
-                            <div className="flex items-center gap-2 text-left">
-                                {icon}
-                                {children}
-                            </div>
-                        </div>
-                        {rightAction && <div className="shrink-0 ml-4 text-left">{rightAction}</div>}
-                    </div>
-                </div>
+                <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-4 overflow-hidden text-left"><div className="px-8 py-6 flex justify-between items-start"><div><h3 className="text-lg font-bold text-gray-900 mb-4">{title} <span className="text-sm font-normal text-gray-400 ml-1">({englishTitle})</span></h3><div className="flex items-center gap-2">{icon}{children}</div></div>{rightAction}</div></div>
             );
-
             return (
                 <div className="p-10 max-w-5xl mx-auto animate-in fade-in duration-300 text-left">
-                    <SettingCard 
-                        title="구글 머천트 센터 요구사항" 
-                        englishTitle="Google Merchant Center requirements"
-                        icon={<div className="bg-emerald-500 rounded-full p-1"><LucideIcon name="Check" size={12} className="text-white" /></div>}
-                        rightAction={<button className="text-gray-500 text-sm flex items-center gap-1 hover:text-gray-800 font-bold">자세히 보기 (View Details) <LucideIcon name="ChevronDown" size={14} /></button>}
-                    >
-                        <p className="text-[15px] font-medium text-gray-800 text-left">구글 머천트 센터의 <span className="text-blue-600 underline cursor-pointer font-bold text-left">요구 사항 (Requirements)</span>을 모두 충족하였습니다.</p>
-                    </SettingCard>
-
-                    <SettingCard 
-                        title="구글 머천트 센터 계정" 
-                        englishTitle="Google Merchant Center account"
-                        icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />}
-                        rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold hover:bg-gray-50 transition shadow-sm">연결 해제 (Disconnect)</button>}
-                    >
-                        <a href="#" className="text-[15px] text-blue-600 font-bold underline flex items-center gap-1 text-left">CS'shop - 5549508284 <LucideIcon name="ExternalLink" size={14} /></a>
-                    </SettingCard>
-
-                    <SettingCard 
-                        title="웹사이트 URL 소유권 확인" 
-                        englishTitle="Claim website URL"
-                        icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />}
-                        rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold hover:bg-gray-50 transition shadow-sm">변경하기 (Change)</button>}
-                    >
-                        <p className="text-[15px] text-gray-800 font-medium flex items-center gap-2 text-left">
-                            소유권이 확인된 웹사이트 URL (Verified Website URL) <a href="https://sjlee12.cafe24.com" className="text-blue-600 underline flex items-center gap-1 font-bold text-left">https://sjlee12.cafe24.com <LucideIcon name="ExternalLink" size={14} /></a>
-                        </p>
-                    </SettingCard>
-
-                    <SettingCard 
-                        title="상품 피드 설정" 
-                        englishTitle="Product feed settings"
-                        rightAction={<button className="text-gray-500 text-sm flex items-center gap-1 hover:text-gray-800 font-bold">자세히 보기 (View Details) <LucideIcon name="ChevronDown" size={14} /></button>}
-                    >
-                        <p className="text-[15px] text-gray-600 font-medium text-left text-left text-left text-left">판매 국가와 배송 설정은 자동으로 동기화 됩니다. <br/>(Selling country and shipping settings are automatically synced.)</p>
-                    </SettingCard>
-
-                    <SettingCard 
-                        title="구글 광고 계정" 
-                        englishTitle="Google Ads account"
-                        icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />}
-                        rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold hover:bg-gray-50 transition shadow-sm">연결 해제 (Disconnect)</button>}
-                    >
-                        <a href="#" className="text-[15px] text-blue-600 font-bold underline flex items-center gap-1 text-left">KRW Billing 01 - 9350044131 <LucideIcon name="ExternalLink" size={14} /></a>
-                    </SettingCard>
-
-                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-4 overflow-hidden text-left">
-                        <div className="px-8 py-6 text-left text-left text-left">
-                            <h3 className="text-lg font-bold text-gray-900 mb-2 text-left">전환 태그 설정 (Conversion tag settings)</h3>
-                            <p className="text-[14px] text-gray-500 mb-6 font-medium text-left">캠페인을 통해 발생한 전환 성과를 추적하고 캠페인의 실적과 광고 노출 효과를 향상시킬 수 있습니다. <br/>(Track conversion performance and improve campaign results.)</p>
-                            <div className="flex items-center justify-between text-left">
-                                <div className="flex items-center gap-8 text-left">
-                                    <span className="text-sm font-bold text-gray-900 text-left">전환 추적 태그 (Conversion Tracking Tag)</span>
-                                    <div className="flex items-center gap-6 text-left">
-                                        <label className="flex items-center gap-2 cursor-pointer group text-left">
-                                            <input type="radio" checked={conversionOn} onChange={() => setConversionOn(true)} className="w-4 h-4 text-blue-600 border-gray-300 shadow-sm text-left" />
-                                            <span className="text-sm font-black group-hover:text-blue-600 transition-colors text-left text-left text-left">켜짐 (ON)</span>
-                                        </label>
-                                        <label className="flex items-center gap-2 cursor-pointer group text-left">
-                                            <input type="radio" checked={!conversionOn} onChange={() => setConversionOn(false)} className="w-4 h-4 text-blue-600 border-gray-300 shadow-sm text-left" />
-                                            <span className="text-sm font-black group-hover:text-blue-600 transition-colors text-left text-left text-left">꺼짐 (OFF)</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                <button onClick={onNext} className="px-10 py-3 bg-[#4b5563] text-white rounded-md text-sm font-black hover:bg-gray-900 transition shadow-md">저장하기 (Save)</button>
-                            </div>
-                        </div>
-                        <div className="bg-[#fff9e6] px-8 py-3 flex justify-between items-center border-t border-[#fef3c7] text-left">
-                            <div className="flex items-center gap-2 text-left text-left text-left">
-                                <div className="bg-yellow-400 rounded-full p-0.5 text-left"><LucideIcon name="Info" size={12} className="text-white" /></div>
-                                <p className="text-[12px] text-gray-700 font-bold text-left">추가 설정을 통해 더욱正確하게 이벤트를 매칭하고 매칭률을 향상해 보세요. (Improve matching rates with additional settings.)</p>
-                            </div>
-                            <button className="text-[12px] text-blue-600 font-black hover:underline text-left">자세히 보기 (View Details) ></button>
-                        </div>
-                    </div>
+                    <SettingCard title="구글 머천트 센터 요구사항" englishTitle="Google Merchant Center requirements" icon={<div className="bg-emerald-500 rounded-full p-1"><LucideIcon name="Check" size={12} className="text-white" /></div>} rightAction={<button className="text-gray-500 text-sm font-bold flex items-center gap-1 hover:text-gray-800">자세히 보기 (View Details) <LucideIcon name="ChevronDown" size={14} /></button>}><p className="text-[15px] font-medium text-gray-800">구글 머천트 센터의 <span className="text-blue-600 underline cursor-pointer font-bold">요구 사항 (Requirements)</span>을 모두 충족하였습니다.</p></SettingCard>
+                    <SettingCard title="구글 머천트 센터 계정" englishTitle="Google Merchant Center account" icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />} rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold shadow-sm hover:bg-gray-50 transition">연결 해제 (Disconnect)</button>}><a href="#" className="text-[15px] text-blue-600 font-bold underline flex items-center gap-1">CS'shop - 5549508284 <LucideIcon name="ExternalLink" size={14} /></a></SettingCard>
+                    <SettingCard title="웹사이트 URL 소유권 확인" englishTitle="Claim website URL" icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />} rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold shadow-sm hover:bg-gray-50 transition">변경하기 (Change)</button>}><p className="text-[15px] text-gray-800 font-medium">소유권이 확인된 웹사이트 URL (Verified Website URL) <a href="https://sjlee12.cafe24.com" className="text-blue-600 underline flex items-center gap-1 font-bold">https://sjlee12.cafe24.com <LucideIcon name="ExternalLink" size={14} /></a></p></SettingCard>
+                    <SettingCard title="상품 피드 설정" englishTitle="Product feed settings" rightAction={<button className="text-gray-500 text-sm font-bold flex items-center gap-1 hover:text-gray-800">자세히 보기 (View Details) <LucideIcon name="ChevronDown" size={14} /></button>}><p className="text-[15px] text-gray-600 font-medium">판매 국가와 배송 설정은 자동으로 동기화 됩니다. <br/>(Selling country and shipping settings are automatically synced.)</p></SettingCard>
+                    <SettingCard title="구글 광고 계정" englishTitle="Google Ads account" icon={<LucideIcon name="Link" size={16} className="text-emerald-500" />} rightAction={<button className="px-4 py-2 border border-gray-300 rounded-md text-sm font-bold shadow-sm hover:bg-gray-50 transition">연결 해제 (Disconnect)</button>}><a href="#" className="text-[15px] text-blue-600 font-bold underline flex items-center gap-1">KRW Billing 01 - 9350044131 <LucideIcon name="ExternalLink" size={14} /></a></SettingCard>
+                    <div className="bg-white rounded-lg border border-gray-200 shadow-sm mb-4 overflow-hidden text-left"><div className="px-8 py-6 text-left"><h3 className="text-lg font-bold text-gray-900 mb-2">전환 태그 설정 (Conversion tag settings)</h3><p className="text-[14px] text-gray-500 mb-6 font-medium">캠페인을 통해 발생한 전환 성과를 추적하고 캠페인의 실적과 광고 노출 효과를 향상시킬 수 있습니다. <br/>(Track conversion performance and improve campaign results.)</p><div className="flex items-center justify-between"><div className="flex items-center gap-8 text-left"><span className="text-sm font-bold text-gray-900">전환 추적 태그 (Conversion Tracking Tag)</span><div className="flex items-center gap-6"><label className="flex items-center gap-2 cursor-pointer group"><input type="radio" checked={conversionOn} onChange={() => setConversionOn(true)} className="w-4 h-4 text-blue-600 border-gray-300" /><span className="text-sm font-black group-hover:text-blue-600 transition-colors">켜짐 (ON)</span></label><label className="flex items-center gap-2 cursor-pointer group"><input type="radio" checked={!conversionOn} onChange={() => setConversionOn(false)} className="w-4 h-4 text-blue-600 border-gray-300" /><span className="text-sm font-black group-hover:text-blue-600 transition-colors">꺼짐 (OFF)</span></label></div></div><button onClick={onNext} className="px-10 py-3 bg-[#4b5563] text-white rounded-md text-sm font-black hover:bg-gray-900 transition shadow-md">저장하기 (Save)</button></div></div><div className="bg-[#fff9e6] px-8 py-3 flex justify-between items-center border-t border-[#fef3c7] text-left"><div className="flex items-center gap-2 text-left"><div className="bg-yellow-400 rounded-full p-0.5 text-left"><LucideIcon name="Info" size={12} className="text-white" /></div><p className="text-[12px] text-gray-700 font-bold">추가 설정을 통해 더욱正確하게 이벤트를 매칭하고 매칭률을 향상해 보세요. (Improve matching rates with additional settings.)</p></div><button className="text-[12px] text-blue-600 font-black hover:underline">자세히 보기 (View Details) ></button></div></div>
                 </div>
             );
         };
 
-        // --- View: Reporting ---
-        const ReportingView = ({ onNew, onEdit }) => {
-            return (
-                <div className="p-8 flex flex-col h-full animate-in fade-in duration-300 text-left">
-                    <div className="flex justify-between items-start mb-6">
-                        <div>
-                            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">쇼핑 캠페인 <span className="text-sm font-normal text-gray-500 mt-1 tracking-tight">캠페인 성과 집계 기준 : 지난 30일</span></h2>
-                            <p className="text-sm text-gray-500">(Shopping Campaign Performance Calculation Basis: Last 30 days)</p>
-                        </div>
-                        <button onClick={onNew} className="bg-[#0050ff] hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-blue-100 transition flex items-center gap-2">
-                            <LucideIcon name="Plus" size={16} /> 새 캠페인 (New Campaign)
-                        </button>
+        // --- View: Reporting (EXACT ORIGINAL V2 STYLE & BANNER) ---
+        const ReportingView = ({ onNew, onEdit }) => (
+            <div className="p-8 flex flex-col h-full animate-in fade-in duration-300 text-left">
+                <div className="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">쇼핑 캠페인 <span className="text-sm font-normal text-gray-500 mt-1 tracking-tight">캠페인 성과 집계 기준 : 지난 30일</span></h2>
+                        <p className="text-sm text-gray-500">(Shopping Campaign Performance Calculation Basis: Last 30 days)</p>
+                    </div>
+                    <button onClick={onNew} className="bg-[#0050ff] hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold shadow-md shadow-blue-100 transition flex items-center gap-2"><LucideIcon name="Plus" size={16} /> 새 캠페인 (New Campaign)</button>
+                </div>
+
+                <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col flex-1 overflow-hidden">
+                    <div className="p-4 border-b flex justify-between items-center bg-gray-50/50">
+                        <button className="bg-white border border-gray-100 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-bold cursor-not-allowed uppercase tracking-tighter">선택 삭제 (Delete Selection)</button>
+                        <div className="relative"><span className="absolute inset-y-0 left-3 flex items-center text-gray-400"><LucideIcon name="Search" size={14} /></span><input type="text" placeholder="캠페인 이름으로 검색 (Search by Campaign Name)" className="pl-9 pr-4 py-1.5 border border-gray-200 rounded-lg text-sm w-96 outline-none focus:ring-1 focus:ring-blue-200 shadow-inner" /></div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-xl shadow-sm flex flex-col flex-1 overflow-hidden">
-                        <div className="p-4 border-b flex justify-between items-center bg-gray-50/50">
-                            <button className="bg-white border border-gray-100 text-gray-400 px-4 py-1.5 rounded-lg text-sm font-bold cursor-not-allowed uppercase tracking-tighter">선택 삭제 (Delete Selection)</button>
-                            <div className="relative">
-                                <span className="absolute inset-y-0 left-3 flex items-center text-gray-400"><LucideIcon name="Search" size={14} /></span>
-                                <input type="text" placeholder="캠페인 이름으로 검색 (Search by Campaign Name)" className="pl-9 pr-4 py-1.5 border border-gray-200 rounded-lg text-sm w-96 outline-none focus:ring-1 focus:ring-blue-200 shadow-inner" />
-                            </div>
-                        </div>
-
-                        <div className="flex-1 overflow-x-auto custom-scrollbar">
-                            <table className="w-full text-left border-collapse min-w-[1450px]">
-                                <thead className="bg-gray-50 text-[11px] font-black text-gray-500 uppercase tracking-widest border-b">
-                                    <tr>
-                                        <th className="p-4 w-12 text-center"><input type="checkbox" className="rounded" /></th>
-                                        <th className="p-4 w-80 text-left">캠페인 이름 (Campaign Name)</th>
-                                        <th className="p-4 w-40 text-center">상태 (Status)</th>
-                                        <th className="p-4 text-right">비용 (Cost)</th>
-                                        <th className="p-4 text-right">노출수 (Imp)</th>
-                                        <th className="p-4 text-right">클릭수 (Clicks)</th>
-                                        <th className="p-4 text-right">CTR</th>
-                                        <th className="p-4 text-right">주문수 (Orders)</th>
-                                        <th className="p-4 text-right font-black">총 매출 (GMV)</th>
-                                        <th className="p-4 text-right font-black">ROAS</th>
-                                        <th className="p-4 w-32 text-center sticky right-0 bg-gray-50 border-l shadow-inner">작업 (Action)</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y text-sm font-medium">
-                                    <CampaignTableRow name="PMAX 1" cost="₩145,000" imp="24,512" clicks="1,102" ctr="4.5%" orders="56" gmv="₩3,420,000" roas="23.5" type="pmax" onEdit={() => onEdit("PMAX 1")} />
-                                </tbody>
-                            </table>
-                        </div>
+                    <div className="flex-1 overflow-x-auto custom-scrollbar">
+                        <table className="w-full text-left border-collapse min-w-[1450px]">
+                            <thead className="bg-gray-50 text-[11px] font-black text-gray-500 uppercase tracking-widest border-b">
+                                <tr>
+                                    <th className="p-4 w-12 text-center"><input type="checkbox" className="rounded" /></th>
+                                    <th className="p-4 w-80">캠페인 이름 (Campaign Name)</th>
+                                    <th className="p-4 w-40 text-center">상태 (Status)</th>
+                                    <th className="p-4 text-right">비용 (Cost)</th>
+                                    <th className="p-4 text-right">노출수 (Imp)</th>
+                                    <th className="p-4 text-right">클릭수 (Clicks)</th>
+                                    <th className="p-4 text-right font-black">총 매출 (GMV)</th>
+                                    <th className="p-4 text-right font-black">ROAS</th>
+                                    <th className="p-4 w-32 text-center sticky right-0 bg-gray-50 border-l shadow-inner">작업 (Action)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y text-sm font-medium">
+                                <CampaignTableRow name="PMAX 1" cost="₩145,000" imp="24,512" clicks="1,102" gmv="₩3,420,000" roas="23.5" type="pmax" onEdit={() => onEdit("PMAX 1")} />
+                                <CampaignTableRow name="Demand Gen 1" cost="₩89,200" imp="18,340" clicks="924" gmv="₩1,120,000" roas="12.5" type="dg" onEdit={() => onEdit("Demand Gen 1")} />
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            );
-        };
 
-        const CampaignTableRow = ({ name, cost, imp, clicks, ctr, orders, gmv, roas, type, onEdit }) => {
+                {/* --- RESTORED BLUE INFO BANNER (EXACTLY AS SCREENSHOT) --- */}
+                <div className="mt-6 p-4 bg-blue-50/50 rounded-xl border border-blue-100 flex items-start gap-3">
+                    <LucideIcon name="Info" size={18} className="text-blue-500 shrink-0 mt-0.5" />
+                    <div className="text-[12px] text-blue-900 leading-relaxed">
+                        <p className="font-bold mb-1">구글 채널에서 생성한 캠페인 리스트입니다. <span className="underline">(List of campaigns created on the Google channel.)</span></p>
+                        <p className="font-medium opacity-80 text-[11px]">구글 채널 외부에서 생성한 캠페인 리스트 전체는 Google Ads 에서 확인하실 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const CampaignTableRow = ({ name, cost, imp, clicks, gmv, roas, type, onEdit }) => {
             const [status, setStatus] = useState('Enabled');
             const [isOpen, setIsOpen] = useState(false);
             const dropRef = useRef(null);
@@ -551,8 +390,9 @@
                     <td className="p-4 text-center"><input type="checkbox" className="rounded border-gray-300 shadow-sm" /></td>
                     <td className="p-4 text-left">
                         <div className="font-black text-gray-900 text-[14px]">{name}</div>
-                        <div className="text-[10px] text-gray-400 mt-1 leading-tight font-bold italic truncate">
-                            {type === 'pmax' ? '추가 광고 소재를 수동으로 등록하시려면 다음으로 이동하세요. (Go to Google Ads)' : '타겟팅을 수동으로 추가하시려면 다음으로 이동하세요. (Go to Google Ads)'}
+                        <div className="text-[10px] text-blue-500 mt-1 leading-tight font-bold italic">
+                            {type === 'pmax' ? '(To manually add more ad assets, please go to) ' : '(To manually add audience targeting, please go to) '}
+                            <span className="underline cursor-pointer">Google Ads Frontend</span>
                         </div>
                     </td>
                     <td className="p-4 text-center relative" ref={dropRef}>
@@ -562,14 +402,18 @@
                             </div>
                             <LucideIcon name="ChevronDown" size={12} className="text-gray-300" />
                         </button>
+                        {isOpen && (
+                            <div className="absolute left-1/2 transform -translate-x-1/2 mt-1 w-32 bg-white border border-gray-100 rounded-lg shadow-xl z-[60] status-dropdown-enter">
+                                <button onClick={() => {setStatus('Enabled'); setIsOpen(false);}} className="w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-gray-50 flex items-center gap-2 border-b"><span className="w-1.5 h-1.5 rounded-full bg-green-500"></span> 활성화 (Enabled)</button>
+                                <button onClick={() => {setStatus('Paused'); setIsOpen(false);}} className="w-full px-4 py-2 text-left text-[11px] font-bold hover:bg-gray-50 flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-gray-400"></span> 일시중지 (Paused)</button>
+                            </div>
+                        )}
                     </td>
                     <td className="p-4 text-right font-mono text-gray-500">{cost}</td>
                     <td className="p-4 text-right font-mono text-gray-500">{imp}</td>
                     <td className="p-4 text-right font-mono text-gray-500">{clicks}</td>
-                    <td className="p-4 text-right font-mono text-gray-500">{ctr}</td>
-                    <td className="p-4 text-right font-mono text-gray-500">{orders}</td>
                     <td className="p-4 text-right font-mono text-gray-900 font-bold">{gmv}</td>
-                    <td className="p-4 text-right font-mono text-green-600 font-black text-[14px]">{roas}</td>
+                    <td className="p-4 text-right font-mono text-green-600 font-black">{roas}</td>
                     <td className="p-4 text-center sticky right-0 bg-white group-hover:bg-blue-50/20 border-l shadow-inner">
                         <button onClick={onEdit} className="text-[#0050ff] hover:text-blue-800 font-black px-4 py-1.5 rounded border border-transparent hover:border-blue-100 transition text-[13px]">편집 (Edit)</button>
                     </td>
@@ -577,121 +421,67 @@
             );
         };
 
-        // --- View: Creation (Modified) ---
+        // --- View: Creation (MODIFIED WITH VALIDATION) ---
         const CreationView = (props) => {
             const [loadingPmax, setLoadingPmax] = useState(false);
-            const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+            const [submittedOnce, setSubmittedOnce] = useState(false);
 
-            const handlePmaxSubmit = () => { setLoadingPmax(true); setTimeout(() => { setLoadingPmax(false); props.setPmaxActive(true); }, 1000); };
+            const isNameInvalid = !props.pmaxName || props.pmaxName.trim().length === 0;
+            const isBudgetInvalid = !props.pmaxBudget || Number(props.pmaxBudget) < 15000;
+
+            const handlePmaxSubmit = () => { 
+                setSubmittedOnce(true);
+                if (isNameInvalid || isBudgetInvalid) return;
+                setLoadingPmax(true); 
+                setTimeout(() => { setLoadingPmax(false); props.setPmaxActive(true); }, 1000); 
+            };
             
-            // Budget feedback logic
             const getBudgetFooter = () => {
                 const budgetNum = Number(props.pmaxBudget);
-                if (budgetNum < 15000) {
-                    return (
-                        <div className="mt-2 text-[10px] font-bold tracking-tight text-red-500 text-left">
-                            최소 예산 15,000원 이상을 입력해주세요. <span className="opacity-80">(Please enter a higher budget than 15,000.)</span>
-                        </div>
-                    );
-                } else if (budgetNum < 70000) {
-                    return (
-                        <div className="mt-2 text-[10px] font-bold tracking-tight text-yellow-600 text-left">
-                            권장 예산보다 낮은 금액은 광고 성과를 낮출 수 있습니다. <span className="opacity-80">(Budget less than this might lower your performance.)</span>
-                        </div>
-                    );
-                }
-                return (
-                    <div className="flex justify-between mt-2 text-[10px] font-bold tracking-tight uppercase text-left">
-                        <span className="text-gray-400 text-left">최소 (Min): ₩15,000</span>
-                        <span className="text-blue-600 text-left">권장 (Recommended): ₩70,000</span>
-                    </div>
-                );
+                if (submittedOnce && isBudgetInvalid) return <div className="mt-2 text-[10px] font-bold tracking-tight text-red-500 text-left">최소 예산(15,000원)보다 높은 금액을 입력해주세요. <span className="opacity-80">(Please enter a higher budget than 15,000)</span></div>;
+                if (budgetNum >= 15000 && budgetNum < 70000) return <div className="mt-2 text-[10px] font-bold tracking-tight text-yellow-600 text-left">권장 예산보다 낮은 금액은 광고 성과를 낮출 수 있습니다. <span className="opacity-80">(Budget less than this might lower your performance;)</span></div>;
+                return <div className="flex justify-between mt-2 text-[10px] font-bold tracking-tight uppercase text-left text-gray-400"><span>최소(Min): ₩15,000</span><span className="text-blue-600">권장(Recommended): ₩70,000</span></div>;
             };
 
             return (
                 <div className="flex flex-col animate-in slide-in-from-right-4 duration-300 text-left bg-white">
                     <div className="bg-white border-b border-gray-100 px-10 py-5 sticky top-0 z-[55] flex items-center gap-10">
-                        <button onClick={props.onExit} className="text-xl font-bold text-gray-400 hover:text-blue-600 transition flex items-center gap-2 group">
-                            기존 캠페인 <span className="font-normal text-base text-gray-400">(Existing Campaigns)</span>
-                            <LucideIcon name="ChevronRight" size={18} className="group-hover:translate-x-1 transition text-gray-300" />
-                        </button>
+                        <button onClick={props.onExit} className="text-xl font-bold text-gray-400 hover:text-blue-600 transition flex items-center gap-2 group">기존 캠페인 <span className="font-normal text-base text-gray-400">(Existing Campaigns)</span><LucideIcon name="ChevronRight" size={18} className="group-hover:translate-x-1 transition text-gray-300" /></button>
                         <div className="h-6 w-[1px] bg-gray-200"></div>
                         <h1 className="text-xl font-black text-gray-800 uppercase tracking-tight">새 캠페인 생성 <span className="font-normal text-base text-gray-400 ml-1 tracking-tight">(Create New Campaign)</span></h1>
                     </div>
 
                     <header className="bg-[#0050ff] text-white relative overflow-hidden h-[220px]">
-                        <div className="max-w-7xl mx-auto px-10 h-full flex items-center relative z-10">
-                            <div className="flex-1 space-y-4 text-left">
-                                <h1 className="text-3xl font-black leading-tight tracking-tight">구글 광고로 더 많은 매출을 창출하세요<br/><span className="text-lg opacity-80 font-bold tracking-tight">(Drive more sales with Google Ads)</span></h1>
-                                <div className="flex items-center gap-3 pt-2">
-                                    <div className="bg-white p-2 rounded shadow-sm flex items-center justify-center"><GoogleIcons.G_Colorful /></div>
-                                    <div className="text-sm font-bold text-left tracking-tight">Google for <span className="opacity-80 font-black">Cafe24</span></div>
-                                </div>
-                            </div>
-
-                            <div className="relative w-[450px] h-full flex items-center justify-center max-lg:hidden translate-x-10">
-                                <div className="absolute right-[-60px] top-[-30px] w-[500px] h-[300px] bg-[#3373ff] rounded-full opacity-60"></div>
-                                <div className="relative z-20">
-                                    <div className="w-[140px] h-[160px] bg-[#e3f2fd] rounded-xl p-2 shadow-2xl border border-white/30 relative overflow-hidden">
-                                        <img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=300" className="w-full h-full object-cover rounded-lg" />
-                                        <div className="absolute top-2 right-2 bg-green-900 bg-opacity-80 p-1 rounded shadow-sm flex items-center justify-center"><LucideIcon name="TrendingUp" size={10} className="text-green-400" /></div>
-                                    </div>
-                                    <div className="absolute bottom-[-15px] left-[10px] right-[-20px] bg-white rounded-lg p-2.5 shadow-2xl flex flex-col gap-1 border border-gray-100 z-30 text-left">
-                                        <div className="flex items-center gap-1.5"><GoogleIcons.G_Colorful /><div className="h-2 bg-[#4285F4] rounded-full w-10"></div></div>
-                                        <div className="flex gap-0.5 text-[#fbc02d] text-[9px] font-black">★ ★ ★ ★ ★</div>
-                                    </div>
-                                </div>
-                                <div className="absolute top-[40px] left-[70px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30 scale-110"><GoogleIcons.YouTube size={22} /></div>
-                                <div className="absolute top-[15px] left-[140px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Gmail size={18} /></div>
-                                <div className="absolute top-[100px] left-[110px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Maps size={18} /></div>
-                                <div className="absolute top-[160px] left-[55px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30"><GoogleIcons.Sparkle /></div>
-                                <div className="absolute bottom-[20px] left-[130px] bg-white p-1.5 rounded-full shadow-lg border border-gray-50 z-30 flex items-center justify-center font-black text-blue-500 text-[10px] w-7 h-7">G</div>
-                            </div>
-                        </div>
+                        <div className="max-w-7xl mx-auto px-10 h-full flex items-center relative z-10"><div className="flex-1 space-y-4 text-left"><h1 className="text-3xl font-black leading-tight tracking-tight">구글 광고로 더 많은 매출을 창출하세요<br/><span className="text-lg opacity-80 font-bold tracking-tight">(Drive more sales with Google Ads)</span></h1><div className="flex items-center gap-3 pt-2"><div className="bg-white p-2 rounded shadow-sm flex items-center justify-center"><GoogleIcons.G_Colorful /></div><div className="text-sm font-bold text-left tracking-tight">Google for <span className="opacity-80 font-black">Cafe24</span></div></div></div></div>
                     </header>
 
                     <main className="max-w-7xl mx-auto px-10 space-y-12 py-12 pb-20 text-left">
-                        {/* PERFORMANCE MAX SECTION */}
                         <section className={`relative transition-all duration-500 ${props.pmaxActive ? 'pointer-events-none opacity-60 scale-[0.99]' : ''}`}>
                             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden grid grid-cols-10 min-h-[480px]">
                                 <div className="col-span-6 p-10 space-y-8 border-r border-gray-50 text-left">
-                                    <div className="space-y-1.5 text-left">
-                                        <h2 className="text-lg font-bold text-[#0050ff] uppercase flex items-center gap-2 text-left"><LucideIcon name="Zap" className="text-blue-600" /> 퍼포먼스 최대화 캠페인 (Performance Max)</h2>
-                                    </div>
+                                    <div className="space-y-1.5 text-left"><h2 className="text-lg font-bold text-[#0050ff] uppercase flex items-center gap-2 text-left"><LucideIcon name="Zap" className="text-blue-600" /> 퍼포먼스 최대화 캠페인 (Performance Max)</h2></div>
                                     <div className="grid md:grid-cols-2 gap-8 text-left">
-                                        <InputGroup label="캠페인 이름 (Campaign Name)" value={props.pmaxName} onChange={props.setPmaxName} disabled={props.pmaxActive} />
-                                        <InputGroup 
-                                            label="일일 예산 (Daily Budget)" 
-                                            value={props.pmaxBudget} 
-                                            onChange={props.setPmaxBudget} 
-                                            type="number" 
-                                            prefix="₩" 
-                                            disabled={props.pmaxActive} 
-                                            footer={getBudgetFooter()}
-                                        />
+                                        <div className="w-full text-left">
+                                            <label className="block text-[10px] font-black mb-2 text-gray-400 tracking-widest uppercase">캠페인 이름 (Campaign Name)</label>
+                                            <input type="text" value={props.pmaxName} onChange={(e) => props.setPmaxName(e.target.value)} disabled={props.pmaxActive} maxLength={255} className={`w-full px-4 py-3 border rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm ${props.pmaxActive ? 'bg-gray-50 text-gray-400' : (submittedOnce && isNameInvalid ? 'border-red-500 ring-1 ring-red-100' : 'border-gray-300')} font-bold text-sm text-gray-800`} />
+                                            <div className="mt-1 flex justify-between items-center">{submittedOnce && isNameInvalid ? <span className="text-[10px] font-bold text-red-500">캠페인 이름을 입력해주세요. (Please enter campaign name.)</span> : <span className="text-[10px] text-gray-400 font-bold">최대 255자 (Max 255 characters)</span>}<span className="text-[10px] text-gray-400 font-bold">{props.pmaxName.length}/255</span></div>
+                                        </div>
+                                        <div className="w-full text-left">
+                                            <label className="block text-[10px] font-black mb-2 text-gray-400 tracking-widest uppercase text-left">일일 예산 (Daily Budget)</label>
+                                            <div className="relative text-left"><span className="absolute left-4 top-[13px] text-gray-400 font-bold text-sm">₩</span><input type="number" value={props.pmaxBudget} onChange={(e) => props.setPmaxBudget(e.target.value)} disabled={props.pmaxActive} className={`w-full pl-8 py-3 border rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm ${props.pmaxActive ? 'bg-gray-50 text-gray-400 border-gray-200 shadow-none' : (submittedOnce && isBudgetInvalid ? 'border-red-500 ring-1 ring-red-100' : 'border-gray-300')} font-bold text-sm text-gray-800`} /></div>
+                                            {getBudgetFooter()}
+                                        </div>
                                     </div>
                                     <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100 text-[12px] text-blue-900 font-bold italic leading-relaxed shadow-sm text-left">구글 AI가 모든 상품을 분석하여 전 채널에 광고를 자동 노출합니다. 수동 설정이 필요 없습니다. <br/>(Google AI analyzes all products and automatically displays ads across all channels. No manual setup required.)</div>
-                                    <div className="pt-8 flex items-center justify-between border-t border-gray-100 text-left">
-                                        <a href="#" className="text-gray-400 font-black text-[11px] uppercase tracking-tight flex items-center gap-1.5 hover:text-blue-600 transition-colors text-left"><LucideIcon name="ExternalLink" size={12} /> 퍼포먼스 최대화 캠페인 도움말 (Performance Max Help)</a>
-                                        <button onClick={handlePmaxSubmit} className={`px-10 py-3.5 rounded-xl font-black text-xs transition-all shadow-xl min-w-[240px] ${props.pmaxActive ? 'bg-gray-200 text-gray-400 shadow-none' : 'bg-[#0050ff] text-white hover:bg-blue-700 active:scale-95'}`}>
-                                            {loadingPmax ? "Processing..." : props.pmaxActive ? "제출 완료 (Submitted)" : "캠페인 제출하기 (Submit Campaign)"}
-                                        </button>
+                                    <div className="pt-8 flex items-center justify-between border-t border-gray-100">
+                                        <a href="#" className="text-gray-400 font-black text-[11px] uppercase tracking-tight flex items-center gap-1.5 hover:text-blue-600 transition-colors"><LucideIcon name="ExternalLink" size={12} /> 퍼포먼스 최대화 캠페인 도움말 (Performance Max Help)</a>
+                                        <button onClick={handlePmaxSubmit} className={`px-10 py-3.5 rounded-xl font-black text-xs transition-all shadow-xl min-w-[240px] ${props.pmaxActive ? 'bg-gray-200 text-gray-400 shadow-none' : 'bg-[#0050ff] text-white hover:bg-blue-700 active:scale-95'}`}>{loadingPmax ? "Processing..." : props.pmaxActive ? "제출 완료 (Submitted)" : "캠페인 제출하기 (Submit Campaign)"}</button>
                                     </div>
                                 </div>
-                                <div className="col-span-4 bg-[#f1f3f4] p-10 flex flex-col items-center justify-center border-l border-gray-100 text-left">
-                                    <div className="w-full max-w-[240px] bg-white rounded-[32px] border-[6px] border-gray-800 shadow-2xl aspect-[9/18] overflow-hidden flex flex-col shrink-0 text-left">
-                                        <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-2 text-left"><GoogleIcons.G_Colorful /><div className="h-1.5 bg-gray-100 rounded-full w-20 text-left"></div></div>
-                                        <div className="p-3 bg-gray-50 flex-1 space-y-3 text-left">
-                                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden text-left">
-                                                <div className="aspect-square relative text-left"><img src={props.images[0].url} className="w-full h-full object-cover" /><div className="absolute top-1 left-1 bg-white/90 text-[7px] font-black px-1 rounded shadow-sm border border-gray-100 text-left">Sponsored</div></div>
-                                                <div className="p-2 space-y-1 text-left">
-                                                    <div className="text-[10px] font-bold text-gray-900 leading-tight text-left">Comfort Sneakers - Limited Edition</div>
-                                                    <div className="flex items-center gap-1 text-left"><span className="text-[10px] font-black text-gray-900 text-left">₩70,000</span><span className="text-[8px] text-gray-400 line-through text-left">₩95,000</span></div>
-                                                    <div className="text-[8px] text-gray-500 text-left">Your Store Name</div>
-                                                    <div className="flex gap-0.5 text-[#fbc02d] text-[7px] text-left">★★★★★ <span className="text-gray-400 text-left">(42)</span></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                <div className="col-span-4 bg-[#f1f3f4] p-10 flex flex-col items-center justify-center border-l border-gray-100">
+                                    <div className="w-full max-w-[240px] bg-white rounded-[32px] border-[6px] border-gray-800 shadow-2xl aspect-[9/18] overflow-hidden flex flex-col shrink-0">
+                                        <div className="px-4 py-3 border-b border-gray-50 flex items-center gap-2"><GoogleIcons.G_Colorful /><div className="h-1.5 bg-gray-100 rounded-full w-20"></div></div>
+                                        <div className="p-3 bg-gray-50 flex-1 space-y-3"><div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden text-left"><div className="aspect-square relative"><img src="https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400" className="w-full h-full object-cover" /><div className="absolute top-1 left-1 bg-white/90 text-[7px] font-black px-1 rounded shadow-sm border border-gray-100 text-left text-left">Sponsored</div></div><div className="p-2 space-y-1"><div className="text-[10px] font-bold text-gray-900 leading-tight">Comfort Sneakers - Limited Edition</div><div className="flex items-center gap-1 text-left text-left"><span className="text-[10px] font-black text-gray-900">₩70,000</span><span className="text-[8px] text-gray-400 line-through">₩95,000</span></div><div className="text-[8px] text-gray-500">Your Store Name</div><div className="flex gap-0.5 text-[#fbc02d] text-[7px]">★★★★★ <span className="text-gray-400 text-left text-left">(42)</span></div></div></div></div>
                                     </div>
                                     <p className="mt-4 text-[9px] font-black text-gray-400 uppercase tracking-widest text-center">Performance Max Preview</p>
                                 </div>
@@ -701,17 +491,6 @@
                 </div>
             );
         };
-
-        const InputGroup = ({ label, value, onChange, type = "text", prefix, disabled, footer }) => (
-            <div className="w-full text-left">
-                <label className="block text-[10px] font-black mb-2 text-gray-400 tracking-widest uppercase text-left">{label}</label>
-                <div className="relative text-left">
-                    {prefix && <span className="absolute left-4 top-[13px] text-gray-400 font-bold text-sm text-left">{prefix}</span>}
-                    <input type={type} value={value} onChange={(e) => onChange(e.target.value)} disabled={disabled} className={`w-full ${prefix ? 'pl-8' : 'px-4'} py-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all shadow-sm ${disabled ? 'bg-gray-50 text-gray-400 border-gray-200 shadow-none' : 'bg-white font-bold text-sm text-gray-800'}`} />
-                </div>
-                {footer}
-            </div>
-        );
 
         const container = document.getElementById('root');
         const root = ReactDOM.createRoot(container);
