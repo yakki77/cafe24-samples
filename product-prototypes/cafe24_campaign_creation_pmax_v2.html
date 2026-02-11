@@ -527,6 +527,28 @@
         const CreationView = (props) => {
             const [loadingPmax, setLoadingPmax] = useState(false);
             const [errors, setErrors] = useState({});
+            
+            // Multi-select Video Logic
+            const [isVideoMenuOpen, setIsVideoMenuOpen] = useState(false);
+            const [selectedVideos, setSelectedVideos] = useState([]);
+            const videoOptions = [
+                { id: 1, name: "Promotion_Video_Summer.mp4" },
+                { id: 2, name: "Product_Showcase_Autumn.mp4" },
+                { id: 3, name: "Brand_Story_Main.mp4" },
+                { id: 4, name: "Limited_Edition_Special.mp4" },
+                { id: 5, name: "Quick_Intro_15s.mp4" },
+                { id: 6, name: "UGC_Review_Testimonial.mp4" }
+            ];
+
+            const toggleVideo = (video) => {
+                if (selectedVideos.find(v => v.id === video.id)) {
+                    setSelectedVideos(selectedVideos.filter(v => v.id !== video.id));
+                } else {
+                    if (selectedVideos.length < 5) {
+                        setSelectedVideos([...selectedVideos, video]);
+                    }
+                }
+            };
 
             const handlePmaxSubmit = () => {
                 const newErrors = {};
@@ -567,13 +589,54 @@
                         <h1 className="text-xl font-black text-gray-800 uppercase tracking-tight">새 캠페인 생성 <span className="font-normal text-base text-gray-400 ml-1">(Create New Campaign)</span></h1>
                     </div>
 
-                    <header className="bg-[#0050ff] text-white relative overflow-hidden h-[220px]">
+                    <header className="bg-[#0050ff] text-white relative overflow-hidden h-[240px]">
                         <div className="max-w-7xl mx-auto px-10 h-full flex items-center relative z-10">
-                            <div className="flex-1 space-y-4 text-left">
+                            <div className="flex-1 space-y-6 text-left">
                                 <h1 className="text-3xl font-black leading-tight tracking-tight">구글 광고로 더 많은 매출을 창출하세요<br/><span className="text-lg opacity-80 font-bold tracking-tight">(Drive more sales with Google Ads)</span></h1>
                                 <div className="flex items-center gap-3 pt-2">
-                                    <div className="bg-white p-2 rounded shadow-sm flex items-center justify-center"><GoogleIcons.G_Colorful /></div>
+                                    <div className="bg-white p-2.5 rounded shadow-sm flex items-center justify-center"><GoogleIcons.G_Colorful /></div>
                                     <div className="text-sm font-bold text-left tracking-tight">Google for <span className="opacity-80 font-black">Cafe24</span></div>
+                                </div>
+                            </div>
+                            
+                            {/* Decorative Illustration (Right Side) */}
+                            <div className="relative w-1/2 h-full hidden md:block">
+                                <div className="absolute right-[-40px] top-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-blue-400/20 rounded-full"></div>
+                                
+                                {/* Floating Icons */}
+                                <div className="absolute right-[300px] top-[40px] w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center p-2 floating-icon" style={{animationDelay: '0s'}}>
+                                    <GoogleIcons.YouTube />
+                                </div>
+                                <div className="absolute right-[220px] top-[10px] w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center p-2 floating-icon" style={{animationDelay: '0.5s'}}>
+                                    <GoogleIcons.Gmail />
+                                </div>
+                                <div className="absolute right-[260px] top-[110px] w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center p-2 floating-icon" style={{animationDelay: '1s'}}>
+                                    <GoogleIcons.Maps />
+                                </div>
+                                <div className="absolute right-[310px] bottom-[40px] w-9 h-9 bg-white rounded-full shadow-lg flex items-center justify-center p-2 floating-icon" style={{animationDelay: '1.5s'}}>
+                                    <GoogleIcons.Sparkle />
+                                </div>
+                                <div className="absolute right-[240px] bottom-[20px] w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center p-2 floating-icon" style={{animationDelay: '2s'}}>
+                                    <div className="text-[10px] font-black text-blue-600">G</div>
+                                </div>
+
+                                {/* Central Card Preview */}
+                                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[220px] bg-white rounded-2xl shadow-2xl p-4 overflow-hidden">
+                                    <div className="aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden relative">
+                                        <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400" className="w-full h-full object-cover" />
+                                        <div className="absolute top-2 right-2 bg-emerald-500 p-1 rounded shadow-sm">
+                                            <LucideIcon name="TrendingUp" size={12} className="text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="mt-3 space-y-2">
+                                        <div className="flex items-center gap-2">
+                                            <GoogleIcons.G_Colorful />
+                                            <div className="h-2 w-16 bg-blue-100 rounded-full"></div>
+                                        </div>
+                                        <div className="flex gap-1">
+                                            {[1,2,3,4,5].map(i => <LucideIcon key={i} name="Star" size={8} className="text-amber-400 fill-amber-400" />)}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -601,25 +664,60 @@
                                         </div>
                                     </div>
 
-                                    {/* Video Assets Section (New - based on image 1) */}
+                                    {/* Video Assets Section (Modified) */}
                                     <div className="space-y-4 pt-4">
-                                        <div className="text-[11px] font-black text-gray-400 tracking-widest uppercase">동영상 에셋 (VIDEO ASSETS) 0/5</div>
+                                        <div className="text-[11px] font-black text-gray-400 tracking-widest uppercase">동영상 에셋 (VIDEO ASSETS) {selectedVideos.length}/5</div>
                                         <div className="relative">
-                                            <div className="w-full px-5 py-4 border border-gray-200 rounded-2xl flex justify-between items-center cursor-pointer hover:border-blue-400 transition shadow-sm">
-                                                <span className="text-sm font-bold text-gray-700">동영상 선택 (Select Videos)</span>
-                                                <LucideIcon name="ChevronDown" size={20} className="text-gray-400" />
+                                            <div 
+                                                onClick={() => setIsVideoMenuOpen(!isVideoMenuOpen)}
+                                                className="w-full px-5 py-4 border border-gray-200 rounded-2xl flex justify-between items-center cursor-pointer hover:border-blue-400 transition shadow-sm bg-white"
+                                            >
+                                                <span className={`text-sm font-bold ${selectedVideos.length > 0 ? 'text-gray-900' : 'text-gray-400'}`}>
+                                                    {selectedVideos.length > 0 
+                                                        ? selectedVideos.map(v => v.name).join(", ").substring(0, 45) + (selectedVideos.map(v => v.name).join(", ").length > 45 ? "..." : "")
+                                                        : "동영상 선택 (Select Videos)"}
+                                                </span>
+                                                <LucideIcon name="ChevronDown" size={20} className={`transition-transform duration-200 ${isVideoMenuOpen ? 'rotate-180 text-blue-500' : 'text-gray-400'}`} />
                                             </div>
+                                            
+                                            {/* Dropdown Menu */}
+                                            {isVideoMenuOpen && (
+                                                <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-[60] overflow-hidden max-h-[250px] overflow-y-auto custom-scrollbar">
+                                                    {videoOptions.map(video => (
+                                                        <div 
+                                                            key={video.id}
+                                                            onClick={() => toggleVideo(video)}
+                                                            className="px-5 py-3.5 hover:bg-blue-50 flex items-center justify-between cursor-pointer border-b border-gray-50 last:border-none transition"
+                                                        >
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center text-red-500">
+                                                                    <LucideIcon name="Play" size={14} />
+                                                                </div>
+                                                                <span className="text-sm font-bold text-gray-700">{video.name}</span>
+                                                            </div>
+                                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-colors ${selectedVideos.find(v => v.id === video.id) ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}>
+                                                                {selectedVideos.find(v => v.id === video.id) && <LucideIcon name="Check" size={12} className="text-white" />}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
                                         </div>
                                         <div className="bg-blue-50/70 border border-blue-100 rounded-2xl p-6 text-left shadow-sm">
                                             <h4 className="text-blue-900 font-black text-sm mb-2">유튜브 동영상 에셋 (Video Assets on YouTube)</h4>
                                             <p className="text-[12px] text-blue-700 font-bold leading-relaxed">
-                                                동영상이 없으면 구글 AI가 자동 생성합니다. <br/>
-                                                <span className="opacity-80 font-medium">(Google AI will automatically generate a video if none is provided.)</span>
+                                                동영상 에셋은 유튜브 채널에 표시됩니다. <br/>
+                                                <span className="opacity-80 font-medium">(Video assets will be displayed on YouTube Channel)</span>
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100 text-[12px] text-blue-900 font-bold italic leading-relaxed shadow-sm">구글 AI가 모든 상품을 분석하여 전 채널에 광고를 자동 노출합니다. 수동 설정이 필요 없습니다. <br/>(Google AI analyzes all products and automatically displays ads across all channels. No manual setup required.)</div>
+                                    {/* Bottom Info Box (Modified) */}
+                                    <div className="bg-blue-50/50 p-5 rounded-xl border border-blue-100 text-[12px] text-blue-900 font-bold italic leading-relaxed shadow-sm">
+                                        구글 AI가 모든 채널에서 모든 제품을 홍보할 수 있도록 에셋을 자동으로 생성합니다. <br/>
+                                        (Google AI will automatically generate assets and promote all of your products across all channels)
+                                    </div>
+                                    
                                     <div className="pt-8 flex items-center justify-between border-t border-gray-100">
                                         <a href="#" className="text-gray-400 font-black text-[11px] uppercase tracking-tight flex items-center gap-1.5 hover:text-blue-600 transition-colors"><LucideIcon name="ExternalLink" size={12} /> 퍼포먼스 최대화 캠페인 도움말 (Performance Max Help)</a>
                                         <button onClick={handlePmaxSubmit} className={`px-10 py-3.5 rounded-xl font-black text-xs transition-all shadow-xl min-w-[240px] ${props.pmaxActive ? 'bg-gray-200 text-gray-400 shadow-none' : 'bg-[#0050ff] text-white hover:bg-blue-700 active:scale-95'}`}>
